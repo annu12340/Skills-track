@@ -3,218 +3,2609 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repo Rescue Rangers</title>
+  <meta name="description" content="Repo Rescue Rangers — three Cursor agent skills for blocking repo disasters before they become calendar events." />
+  <title>Repo Rescue Rangers · Fewer Monday Apologies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-soft: #1f2937;
-      --text: #e2e8f0;
-      --muted: #9ca3af;
+      --bg: #050508;
+      --bg-elevated: #0c0d12;
+      --bg-card: #111318;
+      --text: #fafafa;
+      --text-soft: #9ca3af;
+      --text-muted: #6b7280;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.16);
+
+      --prevent: #34d399;
+      --prevent-dim: rgba(52, 211, 153, 0.14);
+      --prevent-glow: rgba(52, 211, 153, 0.45);
+
+      --diagnose: #38bdf8;
+      --diagnose-dim: rgba(56, 189, 248, 0.14);
+      --diagnose-glow: rgba(56, 189, 248, 0.45);
+
+      --recover: #c084fc;
+      --recover-dim: rgba(192, 132, 252, 0.14);
+      --recover-glow: rgba(192, 132, 252, 0.45);
+
       --accent: #f97316;
-      --accent-soft: #fdba74;
-      --border: rgba(148, 163, 184, 0.18);
+      --accent-dim: rgba(249, 115, 22, 0.16);
+      --danger: #f87171;
+
+      --display: "Syne", system-ui, sans-serif;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --radius: 16px;
+      --radius-lg: 24px;
+
+      /* Heading scale */
+      --heading-hero: clamp(2.4rem, 5.5vw, 3.75rem);
+      --heading-section: clamp(1.85rem, 3.5vw, 2.4rem);
+      --heading-card: 1.0625rem;
+      --heading-tracking: -0.02em;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: smooth; }
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #111827 0%, #0f172a 45%, #020617 100%);
-      color: var(--text);
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
     body {
-      padding: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--accent); color: #000; }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 45%, var(--diagnose) 80%, var(--recover) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .text-gradient-warm {
+      background: linear-gradient(90deg, var(--accent), #fbbf24, var(--danger));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .display-heading {
+      font-family: var(--display);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    /* ── Unified heading system ── */
+    .heading-hero {
+      font-family: var(--display);
+      font-size: var(--heading-hero);
+      font-weight: 600;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+      margin-bottom: 24px;
+    }
+
+    .heading-hero .line-accent {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 0.68em;
+      letter-spacing: -0.01em;
+      margin-top: 0.1em;
+    }
+
+    .heading-section {
+      font-family: var(--display);
+      font-size: var(--heading-section);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: var(--heading-tracking);
+      text-wrap: balance;
+      margin-bottom: 24px;
+    }
+
+    .heading-section--center { text-align: center; }
+
+    .heading-subtitle {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 0.65em;
+      line-height: 1.4;
+      color: var(--text-soft);
+      letter-spacing: -0.01em;
+      margin-top: 0.2em;
+    }
+
+    .heading-card,
+    h4.heading-card {
+      font-family: var(--display);
+      font-size: var(--heading-card);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: var(--heading-tracking);
+      margin-bottom: 6px;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .section-label--center { text-align: center; }
+
+    .section-header {
+      max-width: 640px;
+      margin-inline: auto;
+      margin-bottom: 56px;
+    }
+
+    .section-header--center { text-align: center; }
+
+    .section-header .heading-section { margin-bottom: 14px; }
+
+    .section-header p { color: var(--text-soft); }
+
+    a { color: inherit; }
 
     .container {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 48px 24px 64px;
+      max-width: 1180px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 4vw, 40px);
     }
 
-    .hero {
-      display: grid;
-      gap: 28px;
-      margin-bottom: 48px;
+    section[id] { scroll-margin-top: 88px; }
+
+    /* ── Nav ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid transparent;
+      transition: background 200ms, border-color 200ms, backdrop-filter 200ms;
     }
 
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(3rem, 4vw, 4.4rem);
-      letter-spacing: -0.05em;
-      line-height: 1.02;
+    .nav.scrolled {
+      background: rgba(8, 9, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-color: var(--border);
     }
 
-    .hero p {
-      margin: 0;
-      max-width: 720px;
-      color: var(--muted);
-      font-size: 1.05rem;
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 24px;
     }
 
-    .hero .pill {
-      display: inline-flex;
+    .logo {
+      display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 16px;
+      text-decoration: none;
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--prevent), var(--diagnose), var(--recover));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.25);
+      color: #fff;
+    }
+
+    .logo-mark .icon { width: 18px; height: 18px; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color 150ms;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 10px 18px;
       border-radius: 999px;
-      background: rgba(249, 115, 22, 0.12);
+      background: var(--text);
+      color: var(--bg);
+      text-decoration: none;
+      transition: transform 150ms var(--ease), opacity 150ms;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px; left: 0; right: 0;
+        background: var(--bg-elevated);
+        border-bottom: 1px solid var(--border);
+        padding: 20px 24px 28px;
+        gap: 16px;
+      }
+      .nav-toggle { display: block; }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 140px 0 100px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 50% -20%, rgba(249, 115, 22, 0.18), transparent 55%),
+        radial-gradient(ellipse 55% 45% at 95% 15%, var(--diagnose-dim), transparent 50%),
+        radial-gradient(ellipse 50% 40% at 5% 70%, var(--recover-dim), transparent 50%),
+        radial-gradient(ellipse 40% 30% at 70% 80%, var(--prevent-dim), transparent 45%);
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-bg {
+        animation: hero-drift 18s ease-in-out infinite alternate;
+      }
+    }
+
+    @keyframes hero-drift {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.06) translate(-1%, 2%); }
+    }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .hero-orb-1 {
+      width: 420px; height: 420px;
+      top: -8%; left: 15%;
+      background: var(--accent);
+    }
+
+    .hero-orb-2 {
+      width: 320px; height: 320px;
+      top: 20%; right: 8%;
+      background: var(--diagnose);
+    }
+
+    .hero-orb-3 {
+      width: 280px; height: 280px;
+      bottom: 5%; left: 40%;
+      background: var(--recover);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-orb-1 { animation: float-orb 14s ease-in-out infinite; }
+      .hero-orb-2 { animation: float-orb 11s ease-in-out infinite reverse; }
+      .hero-orb-3 { animation: float-orb 16s ease-in-out infinite 2s; }
+    }
+
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -20px) scale(1.08); }
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(0,0,0,0.6), transparent 75%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 960px;
+      margin-inline: auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: var(--accent);
-      font-weight: 700;
+      background: var(--accent-dim);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      padding: 8px 14px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .badge-dot { animation: pulse 2s ease-in-out infinite; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .heading-hero .text-gradient {
+        background-size: 200% auto;
+        animation: shimmer 6s linear infinite;
+      }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .hero-lede {
+      font-size: clamp(1.05rem, 2vw, 1.2rem);
+      font-weight: 400;
+      color: var(--text-soft);
+      max-width: 620px;
+      margin-inline: auto;
+      margin-bottom: 40px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 56px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--sans);
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 14px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 150ms var(--ease), box-shadow 150ms, background 150ms;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content > * {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: hero-in 800ms var(--ease) forwards;
+    }
+
+    .hero-content .badge { animation-delay: 100ms; }
+    .hero-content .heading-hero { animation-delay: 220ms; }
+    .hero-content .hero-lede { animation-delay: 340ms; }
+    .hero-content .hero-actions { animation-delay: 460ms; }
+    .hero-content .hero-stats { animation-delay: 580ms; }
+
+    @keyframes hero-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-content > * { opacity: 1; transform: none; animation: none; }
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-stat {
+      background: rgba(12, 13, 18, 0.85);
+      padding: 24px 20px;
+      text-align: center;
+      transition: background 200ms;
+    }
+
+    .hero-stat:hover {
+      background: rgba(17, 19, 24, 0.95);
+    }
+
+    .hero-stat-value {
+      font-family: var(--display);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { grid-template-columns: 1fr; }
+    }
+
+    /* ── Story ── */
+    .story {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .story-prose {
+      max-width: 620px;
+    }
+
+    .story-prose p {
+      color: var(--text-soft);
+      margin-bottom: 18px;
+      font-size: 1.02rem;
+      line-height: 1.65;
+    }
+
+    .story-prose p:last-child { margin-bottom: 0; }
+
+    .story-prose p strong { color: var(--text); font-weight: 600; }
+
+    .story-prose code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      color: var(--danger);
+    }
+
+    /* ── Pipeline ── */
+    .pipeline {
+      padding: 80px 0 100px;
+      background: var(--bg-elevated);
+      border-block: 1px solid var(--border);
+    }
+
+    .pipeline-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 820px) {
+      .pipeline-cards { grid-template-columns: 1fr; }
+    }
+
+    .pipeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 250ms, transform 250ms var(--ease-spring), box-shadow 250ms;
+    }
+
+    .pipeline-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45), 0 0 80px var(--skill-glow);
+      border-color: color-mix(in srgb, var(--skill) 40%, var(--border));
+    }
+
+    .pipeline-card.prevent { --skill: var(--prevent); --skill-dim: var(--prevent-dim); --skill-glow: var(--prevent-glow); }
+    .pipeline-card.diagnose { --skill: var(--diagnose); --skill-dim: var(--diagnose-dim); --skill-glow: var(--diagnose-glow); }
+    .pipeline-card.recover { --skill: var(--recover); --skill-dim: var(--recover-dim); --skill-glow: var(--recover-glow); }
+
+    .pipeline-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--skill);
+    }
+
+    .pipeline-phase {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--skill);
+      margin-bottom: 12px;
+    }
+
+    .pipeline-card .heading-card { margin-bottom: 8px; }
+
+    .pipeline-card .skill-name {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .pipeline-card p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 20px;
+    }
+
+    .pipeline-link {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--skill);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pipeline-link:hover { text-decoration: underline; }
+
+    /* ── Pain points / scenarios ── */
+    .pain-section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse 50% 40% at 10% 30%, var(--prevent-dim), transparent 55%),
+        radial-gradient(ellipse 45% 35% at 90% 70%, var(--recover-dim), transparent 55%),
+        var(--bg);
+    }
+
+    .pain-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .pain-columns { grid-template-columns: 1fr; }
+    }
+
+    .pain-story {
+      --skill: var(--prevent);
+      --skill-dim: var(--prevent-dim);
+      --skill-glow: var(--prevent-glow);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 220ms, transform 220ms var(--ease), box-shadow 220ms;
+    }
+
+    .pain-story.diagnose {
+      --skill: var(--diagnose);
+      --skill-dim: var(--diagnose-dim);
+      --skill-glow: var(--diagnose-glow);
+    }
+
+    .pain-story.recover {
+      --skill: var(--recover);
+      --skill-dim: var(--recover-dim);
+      --skill-glow: var(--recover-glow);
+    }
+
+    .pain-story::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--skill);
+    }
+
+    .pain-story:hover {
+      border-color: color-mix(in srgb, var(--skill) 40%, var(--border));
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), 0 0 48px var(--skill-glow);
+    }
+
+    .pain-story-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--skill-dim);
+      border: 1px solid color-mix(in srgb, var(--skill) 35%, transparent);
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+    }
+
+    .pain-story-icon .icon {
+      width: 20px;
+      height: 20px;
+      color: var(--skill);
+    }
+
+    .pain-opener {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.08rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text-soft);
+      letter-spacing: -0.01em;
+    }
+
+    .pain-opener strong {
+      font-style: normal;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .pain-opener em {
+      font-style: normal;
+      color: var(--skill);
+    }
+
+    /* ── Incident simulator ── */
+    .simulator-section {
+      position: relative;
+      padding: 100px 0;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse 60% 48% at 12% 20%, rgba(52, 211, 153, 0.10), transparent 58%),
+        radial-gradient(ellipse 52% 42% at 88% 65%, rgba(249, 115, 22, 0.12), transparent 62%),
+        var(--bg);
+    }
+
+    .simulator-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .simulator-grid { grid-template-columns: 1fr; }
+    }
+
+    .simulator-copy > p {
+      color: var(--text-soft);
+      margin-bottom: 24px;
+      max-width: 560px;
+    }
+
+    .scenario-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 28px 0 18px;
+    }
+
+    @media (max-width: 520px) {
+      .scenario-buttons { grid-template-columns: 1fr; }
+    }
+
+    .scenario-btn {
+      min-height: 66px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-soft);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 160ms var(--ease), border-color 160ms, background 160ms, color 160ms;
+    }
+
+    .scenario-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .scenario-btn[aria-selected="true"] {
+      color: var(--text);
+      border-color: rgba(249, 115, 22, 0.55);
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(255, 255, 255, 0.04));
+      box-shadow: 0 14px 36px rgba(249, 115, 22, 0.10);
+    }
+
+    .scenario-btn strong {
+      display: block;
+      font-size: 0.92rem;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .scenario-btn span {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .simulator-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .simulator-run {
+      background: var(--accent);
+      color: #120700;
+      font-weight: 600;
+    }
+
+    .simulator-run:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(249, 115, 22, 0.2);
+    }
+
+    .simulator-note {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .incident-panel {
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), transparent 38%),
+        var(--bg-card);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.38);
+      padding: 24px;
+      overflow: hidden;
+      transition: transform 180ms var(--ease), border-color 180ms;
+    }
+
+    .incident-panel.is-changing {
+      transform: translateY(-2px) scale(1.01);
+      border-color: rgba(249, 115, 22, 0.45);
+    }
+
+    .incident-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .incident-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .incident-badge {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(249, 115, 22, 0.28);
+      border-radius: 999px;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+
+    .incident-panel .heading-card { margin-bottom: 10px; }
+
+    .incident-panel p {
+      color: var(--text-soft);
+      font-size: 0.94rem;
+    }
+
+    .panic-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      margin: 24px 0;
+    }
+
+    .panic-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-size: 0.8rem;
-      width: fit-content;
     }
 
-    .grid {
-      display: grid;
-      gap: 24px;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .panic-value {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--text);
     }
 
-    .card {
-      background: radial-gradient(circle at top left, rgba(249, 115, 22, 0.12), transparent 40%),
-                  linear-gradient(180deg, var(--panel) 0%, var(--panel-soft) 100%);
+    .panic-meter {
+      grid-column: 1 / -1;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 32px;
-      min-height: 320px;
+    }
+
+    .panic-meter span {
+      display: block;
+      width: 92%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--prevent), var(--accent), var(--danger));
+      transition: width 420ms var(--ease);
+    }
+
+    .terminal-window {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #07080b;
+    }
+
+    .terminal-chrome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .terminal-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .terminal-dot:nth-child(2) { background: var(--accent); }
+    .terminal-dot:nth-child(3) { background: var(--prevent); }
+
+    .terminal-title {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-lines {
+      list-style: none;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      line-height: 1.7;
+      min-height: 160px;
+    }
+
+    .terminal-lines li {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 4px 0;
+    }
+
+    .terminal-lines li:last-child { border-bottom: none; }
+
+    .terminal-lines li::before {
+      content: "$";
+      color: var(--prevent);
+      flex-shrink: 0;
+    }
+
+    .rescue-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .rescue-stack span {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── Skill sections ── */
+    .skill-section {
+      padding: 100px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-section:last-of-type { border-bottom: none; }
+
+    .skill-section.prevent { --skill: var(--prevent); --skill-dim: var(--prevent-dim); --skill-glow: var(--prevent-glow); }
+    .skill-section.diagnose { --skill: var(--diagnose); --skill-dim: var(--diagnose-dim); --skill-glow: var(--diagnose-glow); }
+    .skill-section.recover { --skill: var(--recover); --skill-dim: var(--recover-dim); --skill-glow: var(--recover-glow); }
+
+    .skill-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .skill-layout.reverse { direction: rtl; }
+    .skill-layout.reverse > * { direction: ltr; }
+
+    @media (max-width: 920px) {
+      .skill-layout, .skill-layout.reverse {
+        grid-template-columns: 1fr;
+        direction: ltr;
+      }
+    }
+
+    .skill-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .skill-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--skill-dim);
+      border: 1px solid color-mix(in srgb, var(--skill) 30%, transparent);
+      display: grid;
+      place-items: center;
+      color: var(--skill);
+    }
+
+    .skill-icon .icon { width: 22px; height: 22px; }
+
+    .skill-act {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--skill);
+    }
+
+    .skill-tagline {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--text-soft);
+      margin-bottom: 28px;
+      padding-left: 16px;
+      border-left: 3px solid var(--skill);
+    }
+
+    .story-block {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .story-block-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .story-block-label .icon {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+    }
+
+    .story-block p {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    .story-block p + p { margin-top: 12px; }
+
+    .skill-detail-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+
+    .skill-detail-title {
+      font-family: var(--display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .skill-detail-title .icon {
+      width: 18px;
+      height: 18px;
+      color: var(--skill, var(--accent));
+    }
+
+    .skill-detail-block p {
+      font-size: 0.94rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    .skill-steps {
+      list-style: none;
+      counter-reset: skill-step;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
-      transition: transform 0.3s ease, border-color 0.3s ease;
+      gap: 10px;
     }
 
-    .card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(249, 115, 22, 0.4);
+    .skill-steps li {
+      counter-increment: skill-step;
+      font-size: 0.92rem;
+      color: var(--text-soft);
+      padding-left: 30px;
+      position: relative;
+      line-height: 1.55;
     }
 
-    .card h2 {
-      margin: 0 0 16px;
-      font-size: 1.6rem;
-      letter-spacing: -0.03em;
+    .skill-steps li::before {
+      content: counter(skill-step);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--skill-dim);
+      color: var(--skill);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      display: grid;
+      place-items: center;
     }
 
-    .card p {
-      margin: 0 0 22px;
-      color: var(--muted);
-      font-size: 0.99rem;
-    }
-
-    .card ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      color: var(--text);
-    }
-
-    .card li {
+    .scenario-tags {
       display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    .card li::before {
-      content: "●";
-      color: var(--accent);
-      font-size: 0.7rem;
-      line-height: 1.6;
-      margin-top: 4px;
+    .scenario-tag {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
     }
 
-    .tagline {
+    .scenario-tag.done {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 24px;
-      color: var(--accent);
-      font-weight: 700;
-      letter-spacing: 0.02em;
+      gap: 5px;
+      color: var(--prevent);
+      border-color: color-mix(in srgb, var(--prevent) 30%, transparent);
     }
 
-    .footer {
-      margin-top: 40px;
-      padding: 28px;
-      border-radius: 24px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--muted);
+    .scenario-tag .icon {
+      width: 12px;
+      height: 12px;
     }
 
-    .footer strong {
-      color: var(--text);
+    .scenario-tag.done .icon {
+      color: var(--prevent);
+    }
+
+    .skill-terminal-body {
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      line-height: 1.75;
+      color: var(--text-soft);
+    }
+
+    .skill-terminal-body .t-prompt { color: var(--prevent); }
+    .skill-terminal-body .t-out { color: var(--diagnose); }
+    .skill-terminal-body .t-err { color: var(--danger); }
+    .skill-terminal-body .t-dim { color: var(--text-muted); }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 480px) {
+      .impact-grid { grid-template-columns: 1fr; }
+    }
+
+    .impact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .impact-card-value {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--skill);
+      letter-spacing: -0.02em;
+    }
+
+    .impact-card-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+
+    .feature-list li {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 0.92rem;
+      color: var(--text-soft);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-list li:last-child { border-bottom: none; }
+
+    .feature-list li::before {
+      content: "→";
+      color: var(--skill);
+      font-family: var(--mono);
+      flex-shrink: 0;
+    }
+
+    .skill-path {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      word-break: break-all;
+    }
+
+    /* ── Video demo ── */
+    .video-demo {
+      position: sticky;
+      top: 96px;
     }
 
     @media (max-width: 920px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .video-demo { position: static; }
+    }
+
+    .video-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .video-label span {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .video-status {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--skill-dim);
+      color: var(--skill);
+      border: 1px solid color-mix(in srgb, var(--skill) 25%, transparent);
+    }
+
+    .video-frame {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04),
+        0 24px 48px rgba(0,0,0,0.4),
+        0 0 80px var(--skill-glow);
+    }
+
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      display: none;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .video-frame.has-video video { display: block; }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at center, var(--skill-dim), transparent 70%),
+        var(--bg-card);
+    }
+
+    .video-frame.has-video .video-placeholder { display: none; }
+
+    .video-play-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border-strong);
+      display: grid;
+      place-items: center;
+      color: var(--skill);
+    }
+
+    .video-play-icon .icon {
+      width: 26px;
+      height: 26px;
+      margin-left: 3px;
+    }
+
+    /* ── SVG icons ── */
+    .icon {
+      display: block;
+      line-height: 0;
+      flex-shrink: 0;
+    }
+
+    .icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .icon--fill svg {
+      fill: currentColor;
+      stroke: none;
+    }
+
+    .skill-terminal-body .t-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .skill-terminal-body .t-line .icon {
+      width: 14px;
+      height: 14px;
+      margin-top: 3px;
+    }
+
+    .skill-terminal-body .t-line .icon--ok { color: var(--prevent); }
+    .skill-terminal-body .t-line .icon--bad { color: var(--danger); }
+
+    .video-placeholder p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 280px;
+    }
+
+    .video-hint {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .video-hint code {
+      color: var(--skill);
+      font-size: 0.62rem;
+    }
+
+    .demo-prompt {
+      margin-top: 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .demo-prompt-header {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    .demo-prompt-body {
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .demo-prompt-body em { color: var(--skill); font-style: normal; }
+
+    /* ── Impact dashboard ── */
+    .impact-section {
+      padding: 100px 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 100%, var(--accent-dim), transparent 60%),
+        var(--bg-elevated);
+      border-block: 1px solid var(--border);
+    }
+
+    .impact-section .subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      max-width: 560px;
+      margin-inline: auto;
+      margin-bottom: 56px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .metric-card .value {
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--text), var(--text-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .metric-card .label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .comparison-table {
+      margin-top: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .comparison-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table th {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-card);
+    }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    .comparison-table td:first-child { color: var(--text-soft); }
+    .comparison-table td:nth-child(2) { color: var(--danger); }
+    .comparison-table td:nth-child(3) { color: var(--prevent); font-weight: 600; }
+
+    /* ── Try it ── */
+    .try-section {
+      padding: 100px 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--accent-dim), transparent 60%), var(--bg-elevated);
+    }
+
+    .try-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    @media (max-width: 820px) {
+      .try-grid { grid-template-columns: 1fr; }
+    }
+
+    .try-section p { color: var(--text-soft); margin-bottom: 24px; }
+
+    .install-steps {
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .install-steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .install-steps li::before {
+      content: counter(step);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .install-steps li strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .install-steps li span {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+    }
+
+    .code-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .code-block pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-soft);
+    }
+
+    .code-block .cmd { color: var(--prevent); }
+    .code-block .comment { color: var(--text-muted); }
+    .code-block .path { color: var(--diagnose); }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: color 150ms, border-color 150ms;
+    }
+
+    .copy-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 80px 0 100px;
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-list {
+      max-width: 720px;
+      margin-inline: auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item summary {
+      padding: 20px 0;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .faq-item summary::-webkit-details-marker { display: none; }
+
+    .faq-item summary::after {
+      content: "+";
+      font-family: var(--mono);
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      transition: transform 200ms;
+    }
+
+    .faq-item[open] summary::after { transform: rotate(45deg); }
+
+    .faq-item p {
+      padding-bottom: 20px;
+      color: var(--text-soft);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 56px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, var(--accent-dim), transparent 70%);
+    }
+
+    .footer p:first-child {
+      font-weight: 600;
+    }
+
+    .footer p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer strong { color: var(--text-soft); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ── Reveal animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 600ms var(--ease), transform 600ms var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── Marquee ticker ── */
+    .marquee-wrap {
+      border-block: 1px solid var(--border);
+      background: var(--bg-elevated);
+      overflow: hidden;
+      padding: 18px 0;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      gap: 48px;
+      animation: marquee 28s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track { animation: none; flex-wrap: wrap; width: 100%; justify-content: center; padding: 0 24px; }
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .marquee-item em {
+      font-style: normal;
+      color: var(--text);
+    }
+
+    .marquee-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="hero">
-      <span class="pill">Repo rescue mission</span>
-      <h1>Modern guardrails for messy repos — without the corporate fluff.</h1>
-      <p>Three bold skills. A clean story. One fast route from broken commits and legacy dependency chaos to code that ships with confidence.</p>
+
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="icon-fire" viewBox="0 0 24 24">
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3"/>
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+    </symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+    </symbol>
+    <symbol id="icon-door" viewBox="0 0 24 24">
+      <path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 7.5v7"/><path d="M13 7.5a2.5 2.5 0 0 0-5 0v7a2.5 2.5 0 0 0 5 0"/>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24">
+      <polygon points="5 3 19 12 5 21" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="icon-bolt" viewBox="0 0 24 24">
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8"/>
+    </symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24">
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+    </symbol>
+    <symbol id="icon-film" viewBox="0 0 24 24">
+      <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>
+    </symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+    </symbol>
+  </svg>
+
+  <!-- ═══════════════════ NAV ═══════════════════ -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#" class="logo">
+   
+        Repo Rescue Rangers
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#story">The Story</a></li>
+        <li><a href="#scenarios">Scenarios</a></li>
+        <li><a href="#guard">Prevent</a></li>
+        <li><a href="#bisect">Diagnose</a></li>
+        <li><a href="#resurrect">Recover</a></li>
+        <li><a href="#try-it">Try It</a></li>
+      </ul>
+      <a href="#try-it" class="nav-cta">Install Skills</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">Menu</button>
     </div>
+  </nav>
 
-    <div class="grid">
-      <article class="card">
-        <div>
-          <h2>Detective: Git Bisect AI</h2>
-          <p>When a bug appears out of nowhere, this skill rewinds the repo and hunts the exact commit that brought the failure into the codebase.</p>
-          <ul>
-            <li>Pinpoints the first bad commit with surgical precision.</li>
-            <li>Runs a tiny, reliable reproduction command instead of guessing.</li>
-            <li>Delivers an explanation, not just a commit hash.</li>
-          </ul>
+  <!-- ═══════════════════ HERO ═══════════════════ -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
+    <div class="hero-grid"></div>
+    <div class="container hero-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Hackathon Project · Fewer Monday Apologies
+      </div>
+      <h1 class="heading-hero">
+        <span class="text-gradient" style="font-size: 13vh">Your repo isn't broken.</span>
+        <span class="line-accent">It's auditioning for a postmortem.</span>
+      </h1>
+      <p class="hero-lede">
+       Agent skills for Cursor, Claude Code, or Codex — <br/> one playbook for the whole disaster lifecycle. <br/>
+       Prevent bad commits. Bisect the regression. Resurrect the dependency graveyard. Fewer Monday apologies.
+      </p>
+      <div class="hero-actions">
+        <a href="#try-it" class="btn btn-primary">Copy the Escape Plan ↓</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">3</div>
+          <div class="hero-stat-label">Agentic Skills</div>
         </div>
-        <div class="tagline">Stop blaming the future. Find the culprit now.</div>
-      </article>
-
-      <article class="card">
-        <div>
-          <h2>Bouncer: Semantic Commit Guard</h2>
-          <p>This one stands at the commit gate and checks the intent behind every change. It catches sketchy patterns before they ever become part of the repo.</p>
-          <ul>
-            <li>Detects exposed secrets, architecture breaks, and missing docs.</li>
-            <li>Protects your repo from sloppy or risky commits.</li>
-            <li>Shows exactly what to fix when a commit is rejected.</li>
-          </ul>
+        <div class="hero-stat">
+          <div class="hero-stat-value">&lt;1 min</div>
+          <div class="hero-stat-label">To install </div>
         </div>
-        <div class="tagline">Better than a late-night review rampage.</div>
-      </article>
-
-      <article class="card">
-        <div>
-          <h2>Exorcist: Dependency Resurrection Engine</h2>
-          <p>Upgrade pain? This skill reads your dependency manifest, learns the breaking changes, rewrites code where needed, and runs the build again until the repo stands clean.</p>
-          <ul>
-            <li>Parses `package.json` and `requirements.txt` with context.</li>
-            <li>Maps failures to real API and dependency fixes.</li>
-            <li>Retries the upgrade until the project builds successfully.</li>
-          </ul>
+        <div class="hero-stat">
+          <div class="hero-stat-value">Hours → min</div>
+          <div class="hero-stat-label">Regression hunt time</div>
         </div>
-        <div class="tagline">Keep the upgrade, ditch the dependency graveyard.</div>
-      </article>
+      </div>
     </div>
+  </header>
 
-    <div class="footer">
-      <strong>Why this matters:</strong> no more noisy bot prose, no more “it worked yesterday,” and no more build-breaking upgrades sitting in the dark. This page is the story of code that stays clean, commits that stay safe, and dependencies that stop haunting you.
+  <!-- ═══════════════════ MARQUEE ═══════════════════ -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Prevent</em> · Semantic Commit Guard</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Diagnose</em> · Git Bisect AI</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Resurrection</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Zero new tools to beg security for</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Drop-in agent skills</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Fewer Monday apologies</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Prevent</em> · Semantic Commit Guard</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Diagnose</em> · Git Bisect AI</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Resurrection</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Zero new tools to beg security for</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Drop-in agent skills</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>Fewer Monday apologies</span>
     </div>
   </div>
+
+  <!-- ═══════════════════ STORY ═══════════════════ -->
+  <section class="story" id="story">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Chapter 0 · The Incident</p>
+        <h2 class="heading-section">It started as a "tiny" Friday deploy.</h2>
+        <div class="story-prose">
+          <p>
+            <strong>4:47 PM.</strong> The team ships a "small refactor" before the weekend,
+            which is how most incident reports learn to walk. CI is green. Nobody reads the diff closely.
+            Someone's API key strolls into
+            <code>config.py</code>
+            and the README now claims <em>"no secrets in this repo."</em>
+          </p>
+          <p>
+            <strong>Monday morning.</strong> Finance Slack: a 10% discount on $100 returns
+            <code>-900.0</code> instead of <code>90.0</code>.
+            Forty-seven commits landed over the weekend. Git log is a crime scene with no witnesses.
+            Someone opened a thread called <em>"any ideas???"</em> — it has 127 replies and still no commit hash.
+          </p>
+          <p>
+            <strong>Same week, different fire.</strong> You clone on a new laptop, run
+            <code>pip install</code>, and pydantic v2 breaks immediately —
+            <code>BaseSettings</code> moved to <code>pydantic-settings</code> back in 2021.
+            Your <code>requirements.txt</code> still thinks it's 2019. The upgrade ticket quietly marks itself "blocked."
+          </p>
+          <p>
+            Sound familiar? Most teams have three separate tools for three separate pains.
+            <strong>Repo Rescue Rangers</strong> gives your Cursor agent one playbook for all of them.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PIPELINE ═══════════════════ -->
+  <section class="pipeline">
+    <div class="container">
+      <div class="section-header section-header--center reveal">
+        <p class="section-label section-label--center">The Rescue Pipeline</p>
+        <h2 class="heading-section">Prevent → Diagnose → Recover<span class="heading-subtitle">Three Skills. One playbook. Zero heroics required.</span></h2>
+        <p>Copy the skills from <code style="font-family:var(--mono);font-size:0.85em">skills/</code> into your agent's skills folder and let the agent handle the parts nobody wants to do manually.</p>
+      </div>
+      <div class="pipeline-cards">
+        <article class="pipeline-card prevent reveal">
+          <p class="pipeline-phase">Act I · Prevent</p>
+          <h3 class="heading-card">The Bouncer</h3>
+          <p class="skill-name">semantic-commit-guard</p>
+          <p>Reads the <em>meaning</em> of staged changes — not just syntax. Blocks secrets, architecture violations, and doc/code contradictions before they enter history.</p>
+          <a href="#guard" class="pipeline-link">See demo →</a>
+        </article>
+        <article class="pipeline-card diagnose reveal">
+          <p class="pipeline-phase">Act II · Diagnose</p>
+          <h3 class="heading-card">The Detective</h3>
+          <p class="skill-name">git-bisect-ai</p>
+          <p>Turns "it broke last week" into "commit <code style="font-family:var(--mono);font-size:0.8em">a1b2c3d</code> did it, here's why." Fully automated <code style="font-family:var(--mono);font-size:0.8em">git bisect run</code>.</p>
+          <a href="#bisect" class="pipeline-link">See demo →</a>
+        </article>
+        <article class="pipeline-card recover reveal">
+          <p class="pipeline-phase">Act III · Recover</p>
+          <h3 class="heading-card">The Exorcist</h3>
+          <p class="skill-name">dependency-resurrection-engine</p>
+          <p>Parses manifests, cross-references changelogs, rewrites code for new APIs, and retries builds until the project compiles again.</p>
+          <a href="#resurrect" class="pipeline-link">See demo →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════ SKILL 1: GUARD ═══════════════════ -->
+  <section class="skill-section prevent" id="guard">
+    <div class="container skill-layout">
+      <div class="skill-content reveal">
+        <div class="skill-meta">
+          <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-door"/></svg></span></div>
+          <div>
+            <div class="skill-act">Act I · Prevent · The Bouncer</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/semantic-git-hook-guard/</div>
+          </div>
+        </div>
+        <h2 class="heading-section">Semantic Commit Guard</h2>
+        <p class="skill-tagline">"Lint catches typos. This catches intent — and lies."</p>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+          <p>Pre-commit hooks check syntax. PR bots review after the damage. Neither catches "I committed a live API key AND updated the README to say we don't store secrets." That's a semantic problem — and it's how postmortems get born.</p>
+        </div>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
+          <ol class="skill-steps">
+            <li>Agent reads your staged diff before commit finalizes</li>
+            <li>Scans for secret patterns, architecture violations, doc/code contradictions</li>
+            <li>Rejects with exact line numbers + fix guidance</li>
+            <li>You fix it. Main stays innocent. Weekend preserved.</li>
+          </ol>
+        </div>
+
+        <div class="story-block">
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · shopcart demo</div>
+          <p>Staged changes add <code style="font-family:var(--mono);font-size:0.82em">shopcart/config.py</code> with <code style="font-family:var(--mono);font-size:0.82em">API_KEY = "sk-live-..."</code> and a database password. README gets a "Security" section claiming <em>"No secrets are stored in this repository."</em></p>
+          <p>The guard reads both files together, spots the contradiction, blocks the commit. No bisect. No deps. Just prevention.</p>
+          <div class="scenario-tags">
+            <span class="scenario-tag">skills/semantic-git-hook-guard/</span>
+            <span class="scenario-tag">Skeleton · agent-driven</span>
+          </div>
+        </div>
+
+        <div class="skill-path">skills/semantic-git-hook-guard/SKILL.md</div>
+      </div>
+
+      <div class="video-demo reveal">
+        <div class="terminal-window" style="margin-bottom:20px">
+          <div class="terminal-chrome">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">semantic-commit-guard</span>
+          </div>
+          <div class="skill-terminal-body">
+            <div><span class="t-prompt">$</span> git diff --cached</div>
+            <div class="t-err">+ API_KEY = "sk-live-abc123..."</div>
+            <div class="t-err">+ DATABASE_PASSWORD = "hunter2"</div>
+            <div class="t-dim"> README.md: "No secrets are stored..."</div>
+            <br>
+            <div><span class="t-prompt">guard&gt;</span> <span class="t-out">SCANNING STAGED CHANGES...</span></div>
+            <div class="t-err t-line"><span class="icon icon--bad" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-x"/></svg></span>STRIPE_LIVE_KEY pattern in config.py:12</div>
+            <div class="t-err t-line"><span class="icon icon--bad" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-x"/></svg></span>README contradicts staged code</div>
+            <div><span class="t-prompt">verdict&gt;</span> <span class="t-out">COMMIT REJECTED</span></div>
+            <div class="t-dim">// main never learns your API key. you're welcome.</div>
+          </div>
+        </div>
+        <div class="demo-prompt" style="margin-bottom:20px">
+          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-body">
+            <em>"Run the Semantic Commit Guard on my staged changes. Block anything that violates security or contradicts our docs."</em>
+          </div>
+        </div>
+        <div class="video-label">
+          <span>Live Demo · Semantic Commit Guard</span>
+          <span class="video-status" data-video-status>Awaiting file</span>
+        </div>
+        <div class="video-frame" id="video-guard">
+          <video controls playsinline preload="metadata" poster="assets/demos/guard-poster.jpg">
+            <source src="assets/demos/guard-demo.mp4" type="video/mp4">
+          </video>
+          <div class="video-placeholder">
+            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
+            <h4 class="heading-card">Demo: Blocking a secret + a docs lie</h4>
+            <p>Record the agent rejecting a commit with a live API key and a false security claim.</p>
+          </div>
+        </div>
+        <p class="video-hint">
+          Place your recording at <code>assets/demos/guard-demo.mp4</code> — the player appears automatically once the file is present.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ SKILL 2: BISECT ═══════════════════ -->
+  <section class="skill-section diagnose" id="bisect">
+    <div class="container skill-layout reverse">
+      <div class="skill-content reveal">
+        <div class="skill-meta">
+          <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-search"/></svg></span></div>
+          <div>
+            <div class="skill-act">Act II · Diagnose · The Detective</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/git-bisect-ai/</div>
+          </div>
+        </div>
+        <h2 class="heading-section">Git Bisect AI</h2>
+        <p class="skill-tagline">"Forty-seven commits. One culprit. Five minutes. Zero blame roulette."</p>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+          <p>"It broke last week" is not a commit hash. Manual git archaeology burns hours, produces theories, and occasionally blames the intern (incorrectly). Bisect binary-searches history — but setting it up correctly is fiddly. This skill automates the whole thing.</p>
+        </div>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
+          <ol class="skill-steps">
+            <li>Confirm good commit, bad commit, and a reproduction command (exit 0 = good, nonzero = bad)</li>
+            <li>Validate the repro on both bounds — garbage in, garbage out</li>
+            <li>Run <code style="font-family:var(--mono);font-size:0.85em">git bisect run</code> with the included <code style="font-family:var(--mono);font-size:0.85em">bisect-run.sh</code> wrapper</li>
+            <li>Report culprit SHA, full diff, and <em>why</em> that change broke things</li>
+            <li>Always reset bisect state. Always.</li>
+          </ol>
+        </div>
+
+        <div class="story-block">
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · shopcart discount bug</div>
+          <p><code style="font-family:var(--mono);font-size:0.82em">total([(100.0, 1)], discount_percent=10)</code> should return <strong>90.0</strong>. Returns <strong>-900.0</strong>. Commit <code style="font-family:var(--mono);font-size:0.82em">7781fab</code> "Simplify apply_discount" dropped the <code style="font-family:var(--mono);font-size:0.82em">/100</code>.</p>
+          <p>Good: <code style="font-family:var(--mono);font-size:0.82em">b5f65ee</code> (May 26). Bad: <code style="font-family:var(--mono);font-size:0.82em">HEAD</code>. Agent bisects ~20 commits in ~5 steps. No guard. No deps. Pure detective work.</p>
+          <div class="scenario-tags">
+            <span class="scenario-tag">skills/git-bisect-ai/</span>
+            <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + bisect-run.sh</span>
+          </div>
+        </div>
+
+        <div class="skill-path">skills/git-bisect-ai/SKILL.md + scripts/bisect-run.sh</div>
+      </div>
+
+      <div class="video-demo reveal">
+        <div class="terminal-window" style="margin-bottom:20px">
+          <div class="terminal-chrome">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">git-bisect-ai</span>
+          </div>
+          <div class="skill-terminal-body">
+            <div><span class="t-prompt">$</span> git bisect start HEAD b5f65ee</div>
+            <div><span class="t-prompt">$</span> git bisect run bisect-run.sh \</div>
+            <div class="t-dim">    --test "python3 -c '...discount...'"</div>
+            <br>
+            <div class="t-out">Bisecting: 5 revisions left...</div>
+            <div class="t-out">Bisecting: 2 revisions left...</div>
+            <div class="t-out">7781fab is the first bad commit</div>
+            <br>
+            <div><span class="t-prompt">culprit&gt;</span> "Simplify apply_discount"</div>
+            <div class="t-err">- return amount * (1 - percent / 100)</div>
+            <div class="t-err">+ return amount * (1 - percent)  // oops</div>
+            <div class="t-dim">// finance can use numbers again</div>
+          </div>
+        </div>
+        <div class="demo-prompt" style="margin-bottom:20px">
+          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-body">
+            <em>"The discount math broke sometime this week — it worked on the 26th. Bisect and find the commit."</em>
+          </div>
+        </div>
+        <div class="video-label">
+          <span>Live Demo · Git Bisect AI</span>
+          <span class="video-status" data-video-status>Awaiting file</span>
+        </div>
+        <div class="video-frame" id="video-bisect">
+          <video controls playsinline preload="metadata" poster="assets/demos/bisect-poster.jpg">
+            <source src="assets/demos/bisect-demo.mp4" type="video/mp4">
+          </video>
+          <div class="video-placeholder">
+            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
+            <h4 class="heading-card">Demo: Finding the discount regression</h4>
+            <p>Watch the agent bisect 20+ commits and pinpoint the exact line that broke math.</p>
+          </div>
+        </div>
+        <p class="video-hint">
+          Place your recording at <code>assets/demos/bisect-demo.mp4</code> — the player appears automatically once the file is present.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ SKILL 3: RESURRECT ═══════════════════ -->
+  <section class="skill-section recover" id="resurrect">
+    <div class="container skill-layout">
+      <div class="skill-content reveal">
+        <div class="skill-meta">
+          <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-bolt"/></svg></span></div>
+          <div>
+            <div class="skill-act">Act III · Recover · The Exorcist</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/dependency-graveyard-resurrection/</div>
+          </div>
+        </div>
+        <h2 class="heading-section">Dependency Resurrection Engine</h2>
+        <p class="skill-tagline">"The graveyard isn't permanent. Neither is your build. Probably."</p>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+          <p>Major upgrades cascade. Bump one package → three peer deps scream → import paths moved → you're reading changelogs at 2 AM. Most upgrade attempts die at the first compile error. This skill treats migration as a loop: build, fail, fix, retry, repeat.</p>
+        </div>
+
+        <div class="skill-detail-block">
+          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
+          <ol class="skill-steps">
+            <li>Parse manifests (<code style="font-family:var(--mono);font-size:0.85em">package.json</code>, <code style="font-family:var(--mono);font-size:0.85em">requirements.txt</code>, etc.)</li>
+            <li>Cross-reference changelogs, upgrade notes, error databases</li>
+            <li>Run build → analyze failure → rewrite affected code → bump deps → retry</li>
+            <li>Continue until build passes or upgrade boundaries are identified</li>
+          </ol>
+        </div>
+
+        <div class="story-block">
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · pydantic v1 → v2</div>
+          <p><code style="font-family:var(--mono);font-size:0.82em">requirements.txt</code> pins Flask 1.1, pydantic 1.10, requests 2.22. Code imports <code style="font-family:var(--mono);font-size:0.82em">BaseSettings</code> from pydantic — removed in v2, moved to <code style="font-family:var(--mono);font-size:0.82em">pydantic-settings</code>.</p>
+          <p>Engine bumps pins, adds missing package, rewrites imports, retries until imports succeed. No bisect. No guard. Just exorcism.</p>
+          <div class="scenario-tags">
+            <span class="scenario-tag">skills/dependency-graveyard-resurrection/</span>
+            <span class="scenario-tag">Skeleton · agent-driven</span>
+          </div>
+        </div>
+
+        <div class="skill-path">skills/dependency-graveyard-resurrection/SKILL.md</div>
+      </div>
+
+      <div class="video-demo reveal">
+        <div class="terminal-window" style="margin-bottom:20px">
+          <div class="terminal-chrome">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">dependency-resurrection-engine</span>
+          </div>
+          <div class="skill-terminal-body">
+            <div><span class="t-prompt">$</span> pip install -r requirements.txt</div>
+            <div class="t-err">ImportError: cannot import BaseSettings from pydantic</div>
+            <br>
+            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">pydantic v2 moved BaseSettings → pydantic-settings</span></div>
+            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">adding pydantic-settings to manifest...</span></div>
+            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">rewriting config.py imports...</span></div>
+            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">retry build...</span></div>
+            <br>
+            <div class="t-out t-line"><span class="icon icon--ok" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>build passes. ancient pins laid to rest.</div>
+          </div>
+        </div>
+        <div class="demo-prompt" style="margin-bottom:20px">
+          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-body">
+            <em>"Run the Dependency Resurrection Engine. Upgrade this stack and fix every breaking change until it builds."</em>
+          </div>
+        </div>
+        <div class="video-label">
+          <span>Live Demo · Dependency Resurrection</span>
+          <span class="video-status" data-video-status>Awaiting file</span>
+        </div>
+        <div class="video-frame" id="video-resurrect">
+          <video controls playsinline preload="metadata" poster="assets/demos/resurrect-poster.jpg">
+            <source src="assets/demos/resurrect-demo.mp4" type="video/mp4">
+          </video>
+          <div class="video-placeholder">
+            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
+            <h4 class="heading-card">Demo: Dragging pydantic out of the graveyard</h4>
+            <p>Watch the agent upgrade ancient pins and rewrite imports until the build passes.</p>
+          </div>
+        </div>
+        <p class="video-hint">
+          Place your recording at <code>assets/demos/resurrect-demo.mp4</code> — the player appears automatically once the file is present.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ═══════════════════ TRY IT ═══════════════════ -->
+  <section class="try-section" id="try-it">
+    <div class="container try-grid">
+      <div class="reveal">
+        <p class="section-label">Get Started</p>
+        <h2 class="heading-section">Try it in 60 seconds</h2>
+        <p>Copy the skills into any project. Open the included demo repo to rehearse all three scenarios before your hackathon presentation.</p>
+
+        <ol class="install-steps">
+          <li>
+            <div>
+              <strong>Copy the skills</strong>
+              <span>Copy the three folders from <code style="font-family:var(--mono);font-size:0.82em">skills/</code> into your project's <code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>, <code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code> directory.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Open the demo repo</strong>
+              <span>Navigate to <code style="font-family:var(--mono);font-size:0.82em">test-repo/</code> — a separate git repo with planted bugs for each skill.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Run the prompts</strong>
+              <span>Use the demo prompts from each skill section above. Record your screen for the video slots.</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="reveal">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span>Terminal</span>
+            <button class="copy-btn" data-copy="install-cmd">Copy</button>
+          </div>
+          <pre id="install-cmd"><span class="comment"># Copy skills into your project (pick your agent's folder)</span>
+<span class="cmd">mkdir</span> -p <span class="path">YOUR_PROJECT/.cursor/skills</span>
+<span class="cmd">cp</span> -r skills/git-bisect-ai           <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+<span class="cmd">cp</span> -r skills/semantic-git-hook-guard <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+<span class="cmd">cp</span> -r skills/dependency-graveyard-resurrection <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+
+<span class="comment"># Run demos from the included test repo</span>
+<span class="cmd">cd</span> test-repo
+<span class="cmd">cat</span> DEMO.md</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FAQ ═══════════════════ -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <h2 class="heading-section heading-section--center reveal">Questions you might ask</h2>
+      <div class="faq-list reveal">
+        <details class="faq-item">
+          <summary>How is this different from regular linting or CI?</summary>
+          <p>Linters check syntax and style. CI runs after the fact. Semantic Commit Guard evaluates the <em>meaning</em> of changes — catching doc/code contradictions and security intent violations that no regex rule covers. Git Bisect AI and Dependency Resurrection go further: they perform multi-step autonomous workflows that would take an engineer hours manually.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need to install anything?</summary>
+          <p>No. Skills are plain Markdown in <code style="font-family:var(--mono);font-size:0.82em">skills/</code> — copy the folders into <code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>, <code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code> and your agent picks them up automatically. Git Bisect AI includes a working shell script (<code style="font-family:var(--mono);font-size:0.82em">bisect-run.sh</code>); the other two are skill definitions the agent follows directly.</p>
+        </details>
+  
+        <details class="faq-item">
+          <summary>Can these work outside Cursor?</summary>
+          <p>These skills follow the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> format. The same <code style="font-family:var(--mono);font-size:0.82em">SKILL.md</code> works in Cursor, Claude Code, Codex, and other compatible agents — only the install directory differs.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <p><strong>Repo Rescue Rangers</strong> · Hackathon Project · Agent Skills</p>
+      <p style="margin-top:8px">Prevent · Diagnose · Recover — fewer meetings about one missing slash.</p>
+  
+    </div>
+  </footer>
+
+  <script>
+    // Sticky nav background
+    const nav = document.getElementById('nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile nav toggle
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links')?.classList.toggle('open');
+    });
+
+    // Close mobile nav on link click
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.getElementById('nav-links')?.classList.remove('open');
+      });
+    });
+
+    // Scroll reveal
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+
+    // Copy button
+    const copyText = async text => {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+    };
+
+    document.querySelectorAll('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const target = document.getElementById(btn.dataset.copy);
+        if (!target) return;
+        try {
+          await copyText(target.textContent.trim());
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = orig; }, 1800);
+        } catch {
+          btn.textContent = 'Copy failed';
+          setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+        }
+      });
+    });
+
+    // Incident simulator
+    const incidentScenarios = {
+      secrets: {
+        label: 'Scenario 01',
+        status: 'Panic: 92%',
+        panic: 92,
+        title: 'An API key walked into config.py like it owned the place.',
+        before: 'README says "no secrets here," which is a bold strategy when the staged diff is wearing a live token as a name tag.',
+        note: 'The guard is allergic to secrets and false confidence.',
+        logs: [
+          'semantic-commit-guard scans staged changes',
+          'found STRIPE_LIVE_KEY in shopcart/config.py:12',
+          'README contradiction detected: "no secrets are stored"',
+          'verdict: commit rejected before main learns new vocabulary'
+        ],
+        stack: ['Guard blocks commit', 'Docs contradiction cited', 'Weekend preserved']
+      },
+      discount: {
+        label: 'Scenario 02',
+        status: 'Panic: 88%',
+        panic: 88,
+        title: 'The discount function invented negative revenue.',
+        before: 'A 10% discount returns -900.0. Finance has stopped using punctuation and started using silence.',
+        note: 'The detective brings receipts, commit hashes, and math.',
+        logs: [
+          'git-bisect-ai confirms good commit b5f65ee',
+          'repro: total([(100.0, 1)], discount_percent=10)',
+          'bisect run isolates 7781fab: "Simplify apply_discount"',
+          'culprit: removed /100 and gave discounts executive authority'
+        ],
+        stack: ['Bisect bounds verified', 'Culprit commit found', 'Diff explained']
+      },
+      deps: {
+        label: 'Scenario 03',
+        status: 'Panic: 84%',
+        panic: 84,
+        title: 'The dependency stack woke up from 2019 confused and incompatible.',
+        before: 'Flask is vintage, pydantic moved the furniture, and the import errors are filing noise complaints.',
+        note: 'The engine upgrades, retries, and refuses to be impressed by stack traces.',
+        logs: [
+          'dependency-resurrection-engine parses requirements.txt',
+          'pydantic BaseSettings moved to pydantic-settings',
+          'rewrite imports, add missing package, rerun build',
+          'build passes; ancient pins receive a respectful farewell'
+        ],
+        stack: ['Manifest parsed', 'Breaking changes mapped', 'Build loop passes']
+      },
+      friday: {
+        label: 'Scenario 04',
+        status: 'Panic: 97%',
+        panic: 97,
+        title: 'Friday 4:59 PM shipped a "tiny cleanup" with main-character energy.',
+        before: 'The diff says "minor." The pager says otherwise. The group chat has already renamed itself.',
+        note: 'All three skills enter the room and lower the temperature.',
+        logs: [
+          'guard rejects the secret and the optimistic README',
+          'bisect identifies the exact math regression commit',
+          'resurrection engine modernizes the dependency pile',
+          'status: fewer alarms, fewer theories, more lunch'
+        ],
+        stack: ['Prevent', 'Diagnose', 'Recover', 'Postmortem avoided']
+      }
+    };
+
+    const simulatorQuips = [
+      'Postmortem dodged. Calendar invites remain uncreated.',
+      'Incident contained. Blame budget preserved.',
+      'The repo is still dramatic, but now it is documented.',
+      'Somebody can still go to lunch.'
+    ];
+
+    const scenarioButtons = document.querySelectorAll('[data-scenario]');
+    const incidentPanel = document.getElementById('incident-panel');
+    const incidentLabel = document.getElementById('incident-label');
+    const incidentStatus = document.getElementById('incident-status');
+    const incidentTitle = document.getElementById('incident-title');
+    const incidentBefore = document.getElementById('incident-before');
+    const panicValue = document.getElementById('panic-value');
+    const panicBar = document.getElementById('panic-bar');
+    const incidentLog = document.getElementById('incident-log');
+    const rescueStack = document.getElementById('rescue-stack');
+    const runSimulator = document.getElementById('run-simulator');
+    const simulatorNote = document.getElementById('simulator-note');
+    let activeScenario = 'secrets';
+    let drillCount = 0;
+
+    const renderList = (container, items, tagName = 'li') => {
+      if (!container) return;
+      const nodes = items.map(item => {
+        const el = document.createElement(tagName);
+        el.textContent = item;
+        return el;
+      });
+      container.replaceChildren(...nodes);
+    };
+
+    const updateIncidentScenario = key => {
+      const scenario = incidentScenarios[key];
+      if (!scenario) return;
+      activeScenario = key;
+
+      scenarioButtons.forEach(btn => {
+        const isSelected = btn.dataset.scenario === key;
+        btn.setAttribute('aria-selected', String(isSelected));
+      });
+
+      incidentPanel?.classList.add('is-changing');
+      setTimeout(() => incidentPanel?.classList.remove('is-changing'), 220);
+
+      if (incidentLabel) incidentLabel.textContent = scenario.label;
+      if (incidentStatus) incidentStatus.textContent = scenario.status;
+      if (incidentTitle) incidentTitle.textContent = scenario.title;
+      if (incidentBefore) incidentBefore.textContent = scenario.before;
+      if (panicValue) panicValue.textContent = `${scenario.panic}%`;
+      if (panicBar) panicBar.style.width = `${scenario.panic}%`;
+      if (simulatorNote) simulatorNote.textContent = scenario.note;
+      if (runSimulator) runSimulator.textContent = 'Run Rescue Drill';
+      renderList(incidentLog, scenario.logs);
+      renderList(rescueStack, scenario.stack, 'span');
+    };
+
+    scenarioButtons.forEach(btn => {
+      btn.addEventListener('click', () => updateIncidentScenario(btn.dataset.scenario));
+    });
+
+    runSimulator?.addEventListener('click', () => {
+      const scenario = incidentScenarios[activeScenario];
+      const quip = simulatorQuips[drillCount % simulatorQuips.length];
+      drillCount += 1;
+
+      if (incidentStatus) incidentStatus.textContent = 'Contained';
+      if (panicValue) panicValue.textContent = '12%';
+      if (panicBar) panicBar.style.width = '12%';
+      if (simulatorNote) simulatorNote.textContent = quip;
+      if (runSimulator) runSimulator.textContent = 'Run Again';
+      renderList(incidentLog, [
+        'booting rescue workflow',
+        ...scenario.logs,
+        `final note: ${quip}`
+      ]);
+    });
+
+    updateIncidentScenario(activeScenario);
+
+    // Local MP4: show player when file loads, keep placeholder on missing file
+    document.querySelectorAll('.video-frame video').forEach(video => {
+      const frame = video.closest('.video-frame');
+      const demo = frame?.closest('.video-demo');
+      const status = demo?.querySelector('[data-video-status]');
+      const hint = demo?.querySelector('.video-hint');
+
+      const activate = () => {
+        frame.classList.add('has-video');
+        if (status) status.textContent = 'Ready';
+        if (hint) hint.hidden = true;
+      };
+
+      video.addEventListener('loadeddata', activate, { once: true });
+      video.addEventListener('error', () => {
+        if (status) status.textContent = 'Awaiting file';
+      }, { once: true });
+      video.load();
+    });
+  </script>
 </body>
 </html>
