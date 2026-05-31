@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Bisect AI"
+  short_description: "Find regression commits with git bisect"
+  default_prompt: "Use $git-bisect-ai to find the first commit that introduced this regression."

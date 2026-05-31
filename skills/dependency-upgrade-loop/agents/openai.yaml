@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dependency Upgrade Loop"
+  short_description: "Upgrade stale dependency stacks safely"
+  default_prompt: "Use $dependency-upgrade-loop to upgrade dependencies in this repo and get the build green."

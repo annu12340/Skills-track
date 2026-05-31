@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semantic Commit Guard"
+  short_description: "Review staged commits for semantic risk"
+  default_prompt: "Use $semantic-commit-guard to review my staged changes before I commit."

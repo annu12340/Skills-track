@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dependency Upgrade Loop · Workflow DAG</title>
+<style>
+  :root{
+    --bg:#050508; --panel:#0c0d12; --card:#111318;
+    --text:#fafafa; --soft:#9ca3af; --muted:#6b7280;
+    --border:rgba(255,255,255,.10); --border-strong:rgba(255,255,255,.18);
+    --recover:#c084fc; --recover-dim:rgba(192,132,252,.14);
+    --accent:#f97316; --danger:#f87171; --ok:#34d399;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --sans:"DM Sans",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.55;padding:40px 20px 80px;
+    background-image:radial-gradient(ellipse 70% 50% at 50% -10%,var(--recover-dim),transparent 60%);}
+  .wrap{max-width:1040px;margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--recover);margin-bottom:10px}
+  h1{font-family:var(--sans);font-weight:700;font-size:clamp(1.6rem,3.5vw,2.3rem);
+    letter-spacing:-.02em;margin-bottom:8px}
+  .lede{color:var(--soft);max-width:64ch;margin-bottom:28px;font-size:1.02rem}
+  .lede code{font-family:var(--mono);font-size:.85em;color:var(--recover)}
+  .board{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 30%),var(--card);
+    border:1px solid var(--border);border-radius:20px;padding:20px;
+    box-shadow:0 30px 70px rgba(0,0,0,.45)}
+  svg{display:block;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:22px;
+    font-family:var(--mono);font-size:.72rem;color:var(--soft)}
+  .legend .it{display:flex;align-items:center;gap:9px}
+  .sw{width:30px;height:0;border-top:2px solid var(--recover);display:inline-block}
+  .sw.dash{border-top-style:dashed;border-color:var(--accent)}
+  .sw.dia{width:16px;height:16px;border:2px solid var(--soft);border-top:0;
+    transform:rotate(45deg);border-radius:2px}
+  .sw.stop{width:14px;height:14px;border:0;background:var(--danger);border-radius:3px}
+  footer{margin-top:26px;color:var(--muted);font-size:.8rem;font-family:var(--mono)}
+  footer code{color:var(--soft)}
+
+  /* SVG element styling */
+  .node{fill:var(--card);stroke:var(--border-strong);stroke-width:1.5}
+  .node.entry{fill:var(--recover-dim);stroke:var(--recover)}
+  .pill{fill:var(--recover);stroke:none}
+  .pill.end{fill:var(--ok)}
+  .diamond{fill:#15131c;stroke:var(--recover);stroke-width:1.6}
+  .stopn{fill:rgba(248,113,113,.10);stroke:var(--danger);stroke-width:1.6}
+  .t{fill:var(--text);font-family:var(--sans);font-size:14px;font-weight:600}
+  .sub{fill:var(--soft);font-family:var(--mono);font-size:10.5px;font-weight:400}
+  .pillt{fill:#120016;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em}
+  .pillt.end{fill:#04130c}
+  .diat{fill:var(--text);font-family:var(--sans);font-size:13px;font-weight:600}
+  .stopt{fill:var(--danger);font-family:var(--sans);font-size:13px;font-weight:600}
+  .edge{stroke:var(--recover);stroke-width:1.7;fill:none}
+  .edge.loop{stroke:var(--accent);stroke-width:1.7;stroke-dasharray:6 5}
+  .edge.stop{stroke:var(--danger);stroke-width:1.7;stroke-dasharray:6 5}
+  .elbl{fill:var(--soft);font-family:var(--mono);font-size:10.5px}
+  .elbl.warn{fill:var(--accent)}
+  .elbl.yes{fill:var(--ok)}
+  .elbl.no{fill:var(--danger)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Recover · dependency-upgrade-loop</div>
+  <h1>Dependency Upgrade Loop — Workflow DAG</h1>
+  <p class="lede">The skill's control flow: a safest-first plan feeds a per-item upgrade loop.
+  Each bump runs through the <code>build-probe.sh</code> oracle; failures route into a
+  read&nbsp;→&nbsp;triage&nbsp;→&nbsp;fix&nbsp;→&nbsp;re-verify cycle, with a 3-attempt guard that
+  diverts stuck upgrades to a reported boundary. Solid edges advance; dashed edges are the loops.</p>
+
+  <div class="board">
+  <svg viewBox="165 0 915 1262" role="img" aria-label="Dependency upgrade loop workflow directed graph">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#c084fc"/>
+      </marker>
+      <marker id="arrowL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#f97316"/>
+      </marker>
+      <marker id="arrowS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#f87171"/>
+      </marker>
+    </defs>
+
+    <!-- ============ EDGES (drawn first, under nodes) ============ -->
+    <!-- spine forward -->
+    <path class="edge" marker-end="url(#arrow)" d="M430,68 L430,92"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,156 L430,188"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,252 L430,284"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,348 L430,388"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,444 L430,480"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,536 L430,572"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,628 L430,664"/>
+    <path class="edge" marker-end="url(#arrow)" d="M430,720 L430,742"/>
+    <!-- Green? Yes -> Checkpoint -->
+    <path class="edge" marker-end="url(#arrow)" d="M430,834 L430,872"/>
+    <text class="elbl yes" x="438" y="856">yes</text>
+    <!-- Checkpoint -> More? -->
+    <path class="edge" marker-end="url(#arrow)" d="M430,928 L430,954"/>
+    <!-- More? No -> Report -->
+    <path class="edge" marker-end="url(#arrow)" d="M430,1046 L430,1086"/>
+    <text class="elbl no" x="438" y="1070">no</text>
+    <!-- Report -> done -->
+    <path class="edge" marker-end="url(#arrow)" d="M430,1150 L430,1186"/>
+
+    <!-- Green? No -> Read root error (right rail) -->
+    <path class="edge" marker-end="url(#arrow)" d="M522,788 L620,788 L620,692 L740,692"/>
+    <text class="elbl no" x="566" y="780">no</text>
+    <!-- right rail descending: Read -> Triage -> Fix -->
+    <path class="edge" marker-end="url(#arrow)" d="M890,720 L890,756"/>
+    <path class="edge" marker-end="url(#arrow)" d="M890,812 L890,848"/>
+    <!-- Fix -> re-verify (loop back to Verify, dashed) -->
+    <path class="edge loop" marker-end="url(#arrowL)" d="M740,876 L650,876 L650,692 L580,692"/>
+    <text class="elbl warn" x="600" y="800" transform="rotate(-90 600 800)">re-verify</text>
+    <!-- Fix -> Boundary (guard, dashed) -->
+    <path class="edge stop" marker-end="url(#arrowS)" d="M890,904 L890,948"/>
+    <text class="elbl warn" x="900" y="930">3× no progress</text>
+    <!-- Boundary -> Report -->
+    <path class="edge stop" marker-end="url(#arrowS)" d="M740,976 L650,976 L650,1118 L582,1118"/>
+    <text class="elbl" x="556" y="1010">report</text>
+    <text class="elbl" x="556" y="1024">blocker</text>
+
+    <!-- More? Yes -> next item (long back-edge, dashed, far left) -->
+    <path class="edge loop" marker-end="url(#arrowL)" d="M338,1000 L220,1000 L220,416 L280,416"/>
+    <text class="elbl warn" x="200" y="704" transform="rotate(-90 200 704)">yes · next item</text>
+
+    <!-- ============ NODES ============ -->
+    <!-- START pill -->
+    <rect class="pill" x="340" y="24" width="180" height="44" rx="22"/>
+    <text class="pillt" x="430" y="51" text-anchor="middle">START</text>
+
+    <!-- A Step 0 -->
+    <rect class="node" x="280" y="92" width="300" height="64" rx="13"/>
+    <text class="t" x="430" y="120" text-anchor="middle">Step 0 — Safety &amp; baseline</text>
+    <text class="sub" x="430" y="140" text-anchor="middle">record git state · pick verify cmd · run baseline</text>
+
+    <!-- B Step 1 -->
+    <rect class="node" x="280" y="188" width="300" height="64" rx="13"/>
+    <text class="t" x="430" y="216" text-anchor="middle">Step 1 — Inventory &amp; order plan</text>
+    <text class="sub" x="430" y="236" text-anchor="middle">manifests + lockfiles · safest-first ordering</text>
+
+    <!-- C Step 2 -->
+    <rect class="node" x="280" y="284" width="300" height="64" rx="13"/>
+    <text class="t" x="430" y="312" text-anchor="middle">Step 2 — Baseline verify</text>
+    <text class="sub" x="430" y="332" text-anchor="middle">build-probe.sh = pass/fail oracle</text>
+
+    <!-- LOOP entry -->
+    <rect class="node entry" x="280" y="388" width="300" height="56" rx="13"/>
+    <text class="t" x="430" y="421" text-anchor="middle">◆  For each upgrade item</text>
+
+    <!-- D notes -->
+    <rect class="node" x="280" y="480" width="300" height="56" rx="13"/>
+    <text class="t" x="430" y="503" text-anchor="middle">Read migration notes</text>
+    <text class="sub" x="430" y="522" text-anchor="middle">official changelog before a major bump</text>
+
+    <!-- E bump -->
+    <rect class="node" x="280" y="572" width="300" height="56" rx="13"/>
+    <text class="t" x="430" y="595" text-anchor="middle">Apply one bump + install</text>
+    <text class="sub" x="430" y="614" text-anchor="middle">one logical change · update the lockfile</text>
+
+    <!-- F verify -->
+    <rect class="node" x="280" y="664" width="300" height="56" rx="13"/>
+    <text class="t" x="430" y="687" text-anchor="middle">Verify with build probe</text>
+    <text class="sub" x="430" y="706" text-anchor="middle">capture log · keep path for report</text>
+
+    <!-- G Green? diamond -->
+    <polygon class="diamond" points="430,742 522,788 430,834 338,788"/>
+    <text class="diat" x="430" y="793" text-anchor="middle">Green?</text>
+
+    <!-- H checkpoint -->
+    <rect class="node" x="280" y="872" width="300" height="56" rx="13"/>
+    <text class="t" x="430" y="895" text-anchor="middle">Checkpoint</text>
+    <text class="sub" x="430" y="914" text-anchor="middle">record old → new · error cleared</text>
+
+    <!-- I More? diamond -->
+    <polygon class="diamond" points="430,954 522,1000 430,1046 338,1000"/>
+    <text class="diat" x="430" y="1005" text-anchor="middle">More items?</text>
+
+    <!-- J Report -->
+    <rect class="node" x="280" y="1086" width="300" height="64" rx="13"/>
+    <text class="t" x="430" y="1114" text-anchor="middle">Step 5 — Report</text>
+    <text class="sub" x="430" y="1134" text-anchor="middle">changes · boundaries · behavior · verification</text>
+
+    <!-- DONE pill -->
+    <rect class="pill end" x="340" y="1186" width="180" height="44" rx="22"/>
+    <text class="pillt end" x="430" y="1213" text-anchor="middle">GREEN</text>
+
+    <!-- ===== right rail: fix loop ===== -->
+    <!-- K read error -->
+    <rect class="node" x="740" y="664" width="300" height="56" rx="13"/>
+    <text class="t" x="890" y="687" text-anchor="middle">Read first root error</text>
+    <text class="sub" x="890" y="706" text-anchor="middle">ignore downstream cascade errors</text>
+
+    <!-- L triage -->
+    <rect class="node" x="740" y="756" width="300" height="56" rx="13"/>
+    <text class="t" x="890" y="779" text-anchor="middle">Triage failure (Step 4)</text>
+    <text class="sub" x="890" y="798" text-anchor="middle">ERESOLVE · removed API · types · runtime</text>
+
+    <!-- M fix -->
+    <rect class="node" x="740" y="848" width="300" height="56" rx="13"/>
+    <text class="t" x="890" y="871" text-anchor="middle">Apply targeted fix</text>
+    <text class="sub" x="890" y="890" text-anchor="middle">codemod / smallest call-site change</text>
+
+    <!-- Boundary -->
+    <rect class="stopn" x="740" y="948" width="300" height="56" rx="13"/>
+    <text class="stopt" x="890" y="971" text-anchor="middle">⚑  Blocked boundary</text>
+    <text class="sub" x="890" y="990" text-anchor="middle">surface the decision · don't thrash or hide it</text>
+  </svg>
+  </div>
+
+  <div class="legend">
+    <span class="it"><span class="sw"></span> forward step</span>
+    <span class="it"><span class="sw dash"></span> loop-back / retry</span>
+    <span class="it"><span class="sw dia"></span> decision</span>
+    <span class="it"><span class="sw stop"></span> reported boundary (stop)</span>
+  </div>
+
+  <footer>
+    Source of truth: <code>skills/dependency-upgrade-loop/SKILL.md</code> ·
+    self-contained SVG, no external dependencies.
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+Picture this. It's 11:47 PM on a Friday. Your CI is red. Your Slack is on fire. Your tech lead is typing "..." and has been for four minutes. Someone pushed a commit called fix final FINAL v3 (actually final) and now nothing works.
+
+You don't know what broke. You don't know when it broke. And your dependencies haven't been updated since the Obama administration.
+
+This is not a hypothetical. This is every engineering team. Every. Single. Week.
+
+
+We built Repo Rescue Rangers — three AI agent skills that cover the complete repo disaster lifecycle.
+
+Prevent. Diagnose. Recover.
+
+
+Skill 1: The bouncer
+"Not so fast, cowboy." Before your bad code even touches the repo, this skill reviews your staged diff for meaning. Not just "did you leave a .env file in there" — though yes, it catches that too and redacts the secret before printing it, because we've all seen that Slack message. It's the bouncer at the door of your main branch.
+
+Skill 2: The detective
+CSI: Git History" The build broke. Somewhere in 847 commits, one of them is the murderer. This skill runs git bisect with an AI co-pilot, maps the exit codes correctly and hands you a JSON forensics report pointing at the exact commit. 
+
+Where is how it works
+git bisect is a binary search through your commit history to find the exact commit that introduced a bug.
+
+The core idea
+You tell git two things:
+
+a bad commit (where the bug exists — usually HEAD)
+a good commit (where everything worked — some point in the past)
+Git then checks out the commit exactly halfway between them and asks: good or bad? You test, answer, and it halves the search space again. Repeat until it pinpoints the culprit.
+
+We have automated this. Instead of testing manually, you hand it the skill. Git runs it automatically on each candidate commit:
+
+
+
+
+
+Skill 3: The Upgrader
+"We need to go deeper." Your dependencies are so stale they have a Wikipedia page. This skill upgrades them one logical change at a time, finds the first root error (not the 47-line cascade of lies that follows it), and keeps looping until the build is green. It's the only skill that has genuinely experienced the five stages of grief with npm audit.
+
+
+THE ENGINEERING]
+
+This isn't a mockup. Every skill ships with:
+
+A SKILL.md with a real operating contract, battle card, and pitfalls section
+A working shell helper with correct semantics (the bisect runner alone handles four distinct exit code ranges — we are not normal people)
+A resettable demo repo that plants exactly the scenario the skill was built to solve
+A validation harness that smoke-tests everything in throwaway git repos
+
+Here's the narrative we built the demos around:
+
+A bad commit sneaks past review on a Friday afternoon
+Semantic Guard would have blocked it — but someone used --no-verify like a monster
+The build goes red Monday morning. Git Bisect AI runs the forensics, finds the exact commit in minutes, not hours
+Turns out the project also has three years of dependency rot. Dependency Upgrade Loop takes over, upgrades, rewrites the breaking callsites, and gets the build green
+Three skills. One incident. Zero 3 AM pages.
+
+Every team has a repo that's one bad Friday away from a full incident. We built the skills your AI agent needs to be the on-call engineer who actually knows what they're doing.
+
+Repo Rescue Rangers. Prevent. Diagnose. Recover.
+
+===================
+
+Make one narrative demo across all three skills
+     Keep the isolated demos, but add a “full incident story”:
+      - bad commit sneaks in
+      - semantic guard would have blocked it
+      - bisect finds it
+      - dependency loop repairs the stale project afterward

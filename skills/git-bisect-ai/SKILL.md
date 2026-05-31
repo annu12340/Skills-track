@@ -1,16 +1,16 @@
 ---
 name: git-bisect-ai
 description: >-
-  Autonomously hunt down the exact commit that introduced a bug using an
-  automated git bisect. Use when a user says a feature "broke" / "regressed" /
-  "used to work" / "stopped working" and wants to find which commit caused it,
-  or explicitly asks to bisect, find the offending/first-bad commit, or do
-  regression archaeology. Drives `git bisect run` with a reproduction command
-  (test suite, build, headless-browser check, or any custom command) and
-  reports the culprit commit with its diff and an explanation of the cause.
+  Find the first commit that introduced a regression with automated or manual
+  `git bisect`. Use when a user says something broke, regressed, used to work,
+  stopped working, or asks to find the offending/first-bad commit. Builds a
+  reliable pass/fail reproduction, validates good and bad bounds, drives
+  `git bisect run` with the bundled runner, preserves the user's worktree, and
+  reports the culprit commit with focused diff analysis, cleanup, and a
+  shareable Rescue Receipt.
 ---
 
-# Git Bisect AI — The Autonomous Bug Hunter
+# Git Bisect AI
 
 Turn "this broke sometime last week" into "commit `a1b2c3d` broke it, here's
 why." You act as a forensic QA engineer: pin down a good and a bad commit,
@@ -21,32 +21,66 @@ The whole technique lives or dies on one thing: **a reproduction command that
 reliably exits 0 when the bug is absent and nonzero when it is present.** Get
 that right and the rest is mechanical. Most of your effort goes here.
 
-## Operating mode: auto, with checkpoints
+## Operating Contract
 
-Prefer the fully-automated `git bisect run <script>` path. But **stop and
-confirm with the user twice**:
+- Prefer fully automated `git bisect run` after the reproduction is validated.
+- Preserve the user's worktree. If the current tree is dirty, prefer a temporary
+  `git worktree` for the bisect instead of asking the user to stash unrelated
+  work. Ask only when dirty files are needed by the reproduction and are not
+  committed.
+- Keep reproduction scripts outside the bisected checkout, e.g. under `/tmp`,
+  and call them with absolute paths so historical checkouts cannot delete them.
+- Never leave the repo mid-bisect. Always run `git bisect reset` in the bisect
+  worktree, even on failure.
+- Do not revert, patch, or commit after identifying the culprit unless asked.
+- Before the final response, leave a Rescue Receipt at
+  `.repo-rescue/receipts/<timestamp>-git-bisect-ai.md` unless the repo is
+  read-only or the user asks for no artifacts. Keep it uncommitted unless asked.
+- For browser repros, dirty-worktree patterns, setup command choices, and report
+  templates, read `references/repro-patterns.md` only when that detail is needed.
 
-1. **Before starting** — confirm the good commit, the bad commit, and the exact
-   reproduction command you'll use (after you've validated it, see Step 3).
-2. **After it finishes** — present the culprit and the explanation; don't take
-   follow-up actions (reverting, patching) unless asked.
+## Battle Card
 
-Everything in between runs unattended.
-
----
+- **When to use it:** a behavior regressed, a test started failing, a build
+  broke after some unknown commit, or the user asks for the first-bad/offending
+  commit.
+- **When not to use it:** there is no reproducible pass/fail signal, the
+  suspected range has no known good point yet, the issue is caused by unstaged
+  local edits, or the user wants a fix rather than provenance.
+- **First command to run:** `git status --porcelain` to decide whether to work
+  in place or create a temporary worktree.
+- **Common failure modes:** bad/good bounds don't discriminate, flaky repro
+  command, historical commits cannot build, runner path disappears during
+  checkout, or the repo is left mid-bisect after an abort.
+- **Good final answer includes:** first-bad SHA, author/date/message, tested
+  range and reproduction command, focused diff explanation, cleanup status,
+  Rescue Receipt path, remaining risk, and recommended next action.
 
 ## Workflow
 
 ### Step 0 — Safety check
 
-Run these before touching anything; bisect rewrites the working tree.
+Run these before touching anything:
 
-- `git status --porcelain` — if the tree is dirty, **stop** and ask the user to
-  commit or stash. Don't stash silently; you could lose their work.
-- Record the starting point so you can always return to it:
+- `git status --porcelain` to decide whether to bisect in-place or in a
+  temporary worktree.
+- Record the starting point:
   `git rev-parse --abbrev-ref HEAD` (branch name; may be `HEAD` if detached) and
-  `git rev-parse HEAD` (the SHA). You will restore this in Step 6.
+  `git rev-parse HEAD` (the SHA).
 - Confirm you're in the right repo and it has history: `git log --oneline -1`.
+- Resolve the runner before checking out historical commits:
+
+```bash
+RUNNER="$(find "$(git rev-parse --show-toplevel)" -maxdepth 5 \
+  -path '*/git-bisect-ai/scripts/bisect-run.sh' 2>/dev/null | head -1)"
+```
+
+If `RUNNER` is empty, search the known skill install roots or ask for the
+installed skill path.
+
+If the current tree is dirty and validation requires checking out old commits,
+create a temporary worktree before Step 3 and run validation plus bisect there.
+Do not ask the user to stash unrelated work.
 
 ### Step 1 — Define the bug and pick the bounds
 
@@ -91,55 +125,69 @@ Guidance:
   headless browser, drives the page, and exits nonzero when the assertion
   fails. Make sure `--setup` (re)starts the dev server per commit if the build
   output changes between commits.
+- **Flaky failure:** run the assertion multiple times inside the repro script
+  and fail only on a deterministic signal. A flaky oracle produces a wrong
+  culprit.
 
 ### Step 3 — Validate the reproduction (do NOT skip)
 
-Bisect is garbage-in, garbage-out. Prove the command discriminates **before**
+Bisect is garbage-in, garbage-out. Prove the command discriminates before
 running the search:
 
-1. On the **bad** commit (current HEAD, or `git checkout <bad>`): run your
-   `--test`. It MUST fail (nonzero).
-2. On the **good** commit (`git checkout <good>`): run `--setup` then `--test`.
+1. In the selected workspace, on the **bad** commit (current HEAD, or
+   `git checkout <bad>`): run your `--test`. It MUST fail (nonzero).
+2. In that same workspace, on the **good** commit (`git checkout <good>`): run
+   `--setup` then `--test`.
    It MUST pass (zero).
-3. Return to start: `git checkout <original-ref>`.
+3. Return to the bad commit or original ref before starting bisect.
 
 If the bad commit passes or the good commit fails, your bounds or your repro are
 wrong — fix them here, not after wasting a full bisect. Flaky result? Make the
 test deterministic (pin seeds, add retries inside the script, increase
 timeouts) or fall back to the manual loop in "When automation isn't enough."
 
-### Step 4 — Checkpoint with the user
+### Step 4 — Choose the bisect workspace
 
-Before launching, show: the good SHA, the bad SHA, the commit count and
-estimated steps, and the exact runner invocation. Get a yes.
+- If the current tree is clean, bisect in place and rely on `git bisect reset`.
+- If the current tree is dirty or the user is actively working, create a
+  disposable worktree at the bad commit:
+
+```bash
+WT="${TMPDIR:-/tmp}/git-bisect-ai-$(date +%s)"
+git worktree add --detach "$WT" <bad>
+cd "$WT"
+```
+
+Remove it after cleanup with `git worktree remove "$WT"` when possible.
+
+Before launching, state the good SHA, bad SHA, commit count, estimated steps,
+workspace, and exact runner invocation. If any bound or command is inferred with
+low confidence, ask before continuing.
 
 ### Step 5 — Run the automated bisect
 
-Resolve the runner to the absolute path of `scripts/bisect-run.sh` in the
-installed copy of this skill. Search under the repo root — the skill may live
-at `skills/`, `.cursor/skills/`, `.claude/skills/`, or `.codex/skills/`:
-
 ```bash
 git bisect start <bad> <good>
-RUNNER="$(find "$(git rev-parse --show-toplevel)" -maxdepth 5 \
-  -path '*/git-bisect-ai/scripts/bisect-run.sh' 2>/dev/null | head -1)"
 git bisect run "$RUNNER" \
   --setup "<setup cmd or omit>" \
   --test  "<test cmd>" \
-  --timeout 300        # optional; a hang counts as bad. Needs `timeout`/`gtimeout`
-                       # (macOS: `brew install coreutils`); else runs untimed + warns.
-  # --build-is-bug     # add when hunting a broken build
-  # --invert           # add when the bug is that a test STARTED passing
+  --timeout 300 \
+  --log-dir "${TMPDIR:-/tmp}/git-bisect-ai-logs"
 ```
 
-If `find` returns nothing, ask the user where the skill is installed and pass
-that path explicitly. Prefer an absolute path so checkouts during bisect do not
-lose the runner.
+Useful runner flags:
+- `--setup-timeout <seconds>` to limit install/build setup separately.
+- `--build-is-bug` when a failing setup/build is the regression, not a skipped
+  untestable commit.
+- `--invert` when the bug is that a test started passing.
+- `--allow-test-skip` when the test command intentionally returns 125 for
+  "cannot judge this commit."
 
 The runner (see `scripts/bisect-run.sh`) maps exit codes to git's contract:
 `0`=good, `125`=skip (e.g. a commit that won't build while you're hunting a
-runtime bug), anything else=bad. git checks out the midpoint each round, runs
-the wrapper, and narrows automatically until it prints
+runtime bug), anything else=bad. Test command exit codes that could abort bisect
+are collapsed to a plain bad verdict unless `--allow-test-skip` is set. git
+checks out the midpoint each round, runs the wrapper, and narrows until it prints
 **"`<sha>` is the first bad commit."**
 
 If many commits in the range can't be built/tested, that's normal — they're
@@ -157,8 +205,51 @@ auto-skipped (125); git may report a small set of candidates instead of one.
    - **The explanation** — the point of the whole exercise: read the diff and
      state *why* this change introduced the failure (the specific line/logic),
      not just that it's the boundary commit.
-4. Offer next steps (don't auto-do them): show the fix, draft a revert
+4. Remove a disposable worktree if you created one.
+5. Offer next steps (don't auto-do them): show the fix, draft a revert
    (`git revert <sha>`), or write a regression test that locks the behavior.
+6. Create the Rescue Receipt. Include commands run, evidence found, files you
+   changed, the culprit commit, remaining risk, and the recommended next action.
+   Use the template in `references/repro-patterns.md` when you need the exact
+   structure.
+
+---
+
+## Worked example (end to end)
+
+A `multiply(a, b)` regression: it returns the wrong value, and a test asserts it.
+The user says "math was fine in the v1.0 release."
+
+```bash
+# Step 0 — clean tree, record where we are
+git status --porcelain          # empty: good
+git rev-parse --abbrev-ref HEAD # main   (restore target)
+
+# Step 1 — bounds. bad = HEAD, good = the v1.0 tag.
+git rev-list --count v1.0..HEAD # 18 commits -> ~5 steps (log2 18)
+
+# Step 3 — VALIDATE the repro discriminates, before bisecting
+python -m pytest tests/test_maths.py::test_multiply -q   # on HEAD: FAILS (good — bug present)
+git checkout v1.0
+python -m pytest tests/test_maths.py::test_multiply -q   # PASSES (good — bug absent)
+git checkout main
+
+# Step 5 — run it unattended
+git bisect start HEAD v1.0
+RUNNER="$(find "$(git rev-parse --show-toplevel)" -maxdepth 5 \
+  -path '*/git-bisect-ai/scripts/bisect-run.sh' 2>/dev/null | head -1)"
+git bisect run "$RUNNER" \
+  --test "python -m pytest tests/test_maths.py::test_multiply -q" \
+  --log-dir "${TMPDIR:-/tmp}/git-bisect-ai-logs"
+# -> "a1b2c3d is the first bad commit"
+
+# Step 6 — ALWAYS clean up, then explain
+git bisect reset
+git show a1b2c3d        # read the diff: multiply() was changed to `return a + b`
+```
+
+Report: commit `a1b2c3d`, author/date/message, and the *why* — the operator was
+changed from `*` to `+`, so `multiply` adds instead of multiplies.
 
 ---
 
@@ -203,3 +294,6 @@ a wrong mark sends the search down the wrong half and invalidates the result.
   lower bound produces a confident-but-wrong answer.
 - **Forgetting to reset.** Leaving a repo mid-bisect is confusing and traps the
   user in a detached state. `git bisect reset` is non-negotiable cleanup.
+- **Uncommitted repro dependencies.** If the repro needs local edits, commit
+  them to a temporary branch or move the repro outside the checkout; otherwise
+  historical checkouts will not contain what the test expects.

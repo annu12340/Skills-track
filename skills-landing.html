@@ -1831,6 +1831,163 @@
       background: var(--accent);
       flex-shrink: 0;
     }
+
+    /* ── Hackathon ── */
+    .hackathon-section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse 60% 50% at 18% 20%, var(--diagnose-dim), transparent 58%),
+        radial-gradient(ellipse 55% 45% at 85% 75%, var(--recover-dim), transparent 60%),
+        var(--bg-elevated);
+    }
+
+    .hackathon-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .hackathon-grid { grid-template-columns: 1fr; }
+    }
+
+    .hackathon-prose p {
+      color: var(--text-soft);
+      margin-bottom: 18px;
+      line-height: 1.65;
+    }
+
+    .hackathon-prose p:last-child { margin-bottom: 0; }
+
+    .hackathon-prose strong { color: var(--text); font-weight: 600; }
+
+    .event-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
+    }
+
+    .event-card-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .event-card-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .event-card-row:first-child { padding-top: 0; }
+
+    .event-card-row .icon {
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .event-card-row dt {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .event-card-row dd {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ── Problem-statement fit ── */
+    .fit-section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .problem-quote {
+      max-width: 760px;
+      margin: 0 auto 56px;
+      padding: 32px 36px;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: linear-gradient(135deg, var(--accent-dim), rgba(255, 255, 255, 0.02));
+    }
+
+    .problem-quote-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .problem-quote p {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .fit-grid { grid-template-columns: 1fr; }
+    }
+
+    .fit-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+      transition: border-color 220ms, transform 220ms var(--ease);
+    }
+
+    .fit-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+    }
+
+    .fit-card-tag {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .fit-card h3 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .fit-card p {
+      font-size: 0.92rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .fit-card p code {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      color: var(--diagnose);
+    }
   </style>
 </head>
 <body>
@@ -1883,7 +2040,8 @@
         <li><a href="#scenarios">Scenarios</a></li>
         <li><a href="#guard">Prevent</a></li>
         <li><a href="#bisect">Diagnose</a></li>
-        <li><a href="#resurrect">Recover</a></li>
+        <li><a href="#upgrade-loop">Recover</a></li>
+        <li><a href="#hackathon">Hackathon</a></li>
         <li><a href="#try-it">Try It</a></li>
       </ul>
       <a href="#try-it" class="nav-cta">Install Skills</a>
@@ -1909,7 +2067,7 @@
       </h1>
       <p class="hero-lede">
        Agent skills for Cursor, Claude Code, or Codex — <br/> one playbook for the whole disaster lifecycle. <br/>
-       Prevent bad commits. Bisect the regression. Resurrect the dependency graveyard. Fewer Monday apologies.
+       Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack. Fewer Monday apologies.
       </p>
       <div class="hero-actions">
         <a href="#try-it" class="btn btn-primary">Copy the Escape Plan ↓</a>
@@ -1936,53 +2094,140 @@
     <div class="marquee-track">
       <span class="marquee-item"><span class="marquee-dot"></span><em>Prevent</em> · Semantic Commit Guard</span>
       <span class="marquee-item"><span class="marquee-dot"></span><em>Diagnose</em> · Git Bisect AI</span>
-      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Resurrection</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Upgrade Loop</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Zero new tools to beg security for</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Drop-in agent skills</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Fewer Monday apologies</span>
       <span class="marquee-item"><span class="marquee-dot"></span><em>Prevent</em> · Semantic Commit Guard</span>
       <span class="marquee-item"><span class="marquee-dot"></span><em>Diagnose</em> · Git Bisect AI</span>
-      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Resurrection</span>
+      <span class="marquee-item"><span class="marquee-dot"></span><em>Recover</em> · Dependency Upgrade Loop</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Zero new tools to beg security for</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Drop-in agent skills</span>
       <span class="marquee-item"><span class="marquee-dot"></span>Fewer Monday apologies</span>
     </div>
   </div>
 
-  <!-- ═══════════════════ STORY ═══════════════════ -->
-  <section class="story" id="story">
-    <div class="container">
+    <!-- ═══════════════════ STORY ═══════════════════ -->
+    <section class="story" id="story">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">Chapter 0 · The Incident</p>
+          <h2 class="heading-section">It started as a "tiny" Friday deploy.</h2>
+          <div class="story-prose">
+            <p>
+              <strong>4:47 PM.</strong> The team ships a "small refactor" before the weekend,
+              which is how most incident reports learn to walk. CI is green. Nobody reads the diff closely.
+              Someone's API key strolls into
+              <code>config.py</code>
+              and the README now claims <em>"no secrets in this repo."</em>
+            </p>
+            <p>
+              <strong>Monday morning.</strong> Finance Slack: <code>multiply(4, 5)</code> returns
+              <code>9</code> instead of <code>20</code>, and every total is quietly wrong.
+              Forty-seven commits landed over the weekend. Git log is a crime scene with no witnesses.
+              Someone opened a thread called <em>"any ideas???"</em> — it has 127 replies and still no commit hash.
+            </p>
+            <p>
+              <strong>Same week, different fire.</strong> You clone on a new laptop, run
+              <code>pip install</code>, and pydantic v2 breaks immediately —
+              <code>BaseSettings</code> moved to <code>pydantic-settings</code> back in 2021.
+              Your <code>requirements.txt</code> still thinks it's 2019. The upgrade ticket quietly marks itself "blocked."
+            </p>
+            <p>
+              Sound familiar? Most teams have three separate tools for three separate pains.
+              <strong>Repo Rescue Rangers</strong> gives your Cursor agent one playbook for all of them.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <!-- ═══════════════════ HACKATHON ═══════════════════ -->
+  <section class="hackathon-section" id="hackathon">
+    <div class="container hackathon-grid">
       <div class="reveal">
-        <p class="section-label">Chapter 0 · The Incident</p>
-        <h2 class="heading-section">It started as a "tiny" Friday deploy.</h2>
-        <div class="story-prose">
+        <p class="section-label">Where it was built</p>
+        <h2 class="heading-section">Built at the UCWS Singapore Hackathon 2026</h2>
+        <div class="hackathon-prose">
           <p>
-            <strong>4:47 PM.</strong> The team ships a "small refactor" before the weekend,
-            which is how most incident reports learn to walk. CI is green. Nobody reads the diff closely.
-            Someone's API key strolls into
-            <code>config.py</code>
-            and the README now claims <em>"no secrets in this repo."</em>
+            <strong>Repo Rescue Rangers</strong> was conceived and shipped during the
+            <strong>UCWS Singapore Hackathon 2026</strong> — a build-it-in-the-room sprint with the
+            theme of <em>modular, reusable Agent Skills</em>.
           </p>
           <p>
-            <strong>Monday morning.</strong> Finance Slack: a 10% discount on $100 returns
-            <code>-900.0</code> instead of <code>90.0</code>.
-            Forty-seven commits landed over the weekend. Git log is a crime scene with no witnesses.
-            Someone opened a thread called <em>"any ideas???"</em> — it has 127 replies and still no commit hash.
+            The brief was simple and demanding: don't build a one-off demo, build something other
+            developers can drop into their own repos. So we picked three pains every team actually
+            lives through — a leaked secret, a mystery regression, a stack that no longer builds —
+            and turned each into a portable skill that works across Claude Code, Cursor, and Codex.
           </p>
           <p>
-            <strong>Same week, different fire.</strong> You clone on a new laptop, run
-            <code>pip install</code>, and pydantic v2 breaks immediately —
-            <code>BaseSettings</code> moved to <code>pydantic-settings</code> back in 2021.
-            Your <code>requirements.txt</code> still thinks it's 2019. The upgrade ticket quietly marks itself "blocked."
-          </p>
-          <p>
-            Sound familiar? Most teams have three separate tools for three separate pains.
-            <strong>Repo Rescue Rangers</strong> gives your Cursor agent one playbook for all of them.
+            Three skills, one playbook, zero install step. Everything you see on this page is the
+            hackathon deliverable.
           </p>
         </div>
       </div>
+      <div class="reveal">
+        <dl class="event-card">
+          <div class="event-card-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-bolt"/></svg></span>
+            <div><dt>Event</dt><dd>UCWS Singapore Hackathon 2026</dd></div>
+          </div>
+          <div class="event-card-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-shield"/></svg></span>
+            <div><dt>Track</dt><dd>Skills · Modular, reusable plugins</dd></div>
+          </div>
+          <div class="event-card-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>
+            <div><dt>Deliverable</dt><dd>Three portable Agent Skills + helper scripts</dd></div>
+          </div>
+          <div class="event-card-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>
+            <div><dt>Status</dt><dd>Implemented &amp; demoed in isolated sandboxes</dd></div>
+          </div>
+        </dl>
+      </div>
     </div>
   </section>
+
+  <!-- ═══════════════════ PROBLEM-STATEMENT FIT ═══════════════════ -->
+  <section class="fit-section" id="problem-fit">
+    <div class="container">
+      <div class="section-header section-header--center reveal">
+        <p class="section-label section-label--center">How it fits the problem statement</p>
+        <h2 class="heading-section">Built to the brief — point by point</h2>
+      </div>
+
+      <blockquote class="problem-quote reveal">
+        <p class="problem-quote-label">Skills</p>
+        <p>"Build modular, reusable skill plugins that developers around the world can integrate into their own projects."</p>
+      </blockquote>
+
+      <div class="fit-grid">
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Modular</p>
+          <h3>One skill, one job</h3>
+          <p>Each skill is a self-contained folder — <code>SKILL.md</code> plus optional <code>scripts/</code>, <code>references/</code>, and <code>agents/</code>. Prevent, diagnose, and recover are cleanly separated, so you adopt one or all three without entangling them.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Reusable</p>
+          <h3>Drop into any repo</h3>
+          <p>No application, no package manager, no install step. The skills are plain Markdown and shell helpers that work on any project — and they ship with resettable demo sandboxes so anyone can rehearse them in seconds.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Skill plugins</p>
+          <h3>Open Agent Skills format</h3>
+          <p>Every skill follows the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> spec. The same <code>SKILL.md</code> runs in Claude Code, Cursor, and Codex — only the install directory differs.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Integrate anywhere</p>
+          <h3>Copy &amp; go for developers worldwide</h3>
+          <p>Copy the three folders from <code>skills/</code> into <code>.claude/skills/</code>, <code>.cursor/skills/</code>, or <code>.codex/skills/</code> and the agent picks them up automatically. That's the whole integration.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
 
   <!-- ═══════════════════ PIPELINE ═══════════════════ -->
   <section class="pipeline">
@@ -2009,10 +2254,10 @@
         </article>
         <article class="pipeline-card recover reveal">
           <p class="pipeline-phase">Act III · Recover</p>
-          <h3 class="heading-card">The Exorcist</h3>
-          <p class="skill-name">dependency-resurrection-engine</p>
+          <h3 class="heading-card">The Upgrade Loop</h3>
+          <p class="skill-name">dependency-upgrade-loop</p>
           <p>Parses manifests, cross-references changelogs, rewrites code for new APIs, and retries builds until the project compiles again.</p>
-          <a href="#resurrect" class="pipeline-link">See demo →</a>
+          <a href="#upgrade-loop" class="pipeline-link">See demo →</a>
         </article>
       </div>
     </div>
@@ -2026,8 +2271,8 @@
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-door"/></svg></span></div>
           <div>
-            <div class="skill-act">Act I · Prevent · The Bouncer</div>
-            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/semantic-git-hook-guard/</div>
+            <div class="skill-act">Skill I · Prevent · The Bouncer</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/semantic-commit-guard/</div>
           </div>
         </div>
         <h2 class="heading-section">Semantic Commit Guard</h2>
@@ -2049,16 +2294,16 @@
         </div>
 
         <div class="story-block">
-          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · shopcart demo</div>
-          <p>Staged changes add <code style="font-family:var(--mono);font-size:0.82em">shopcart/config.py</code> with <code style="font-family:var(--mono);font-size:0.82em">API_KEY = "sk-live-..."</code> and a database password. README gets a "Security" section claiming <em>"No secrets are stored in this repository."</em></p>
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · commit-guard-demo</div>
+          <p>Staged changes hardcode <code style="font-family:var(--mono);font-size:0.82em">API_KEY = "sk-live-..."</code> and a DB password into <code style="font-family:var(--mono);font-size:0.82em">app/config.py</code>, smuggle raw SQL into the thin handler layer, and add a README "Security" section claiming <em>"No secrets are stored in this repository."</em></p>
           <p>The guard reads both files together, spots the contradiction, blocks the commit. No bisect. No deps. Just prevention.</p>
           <div class="scenario-tags">
-            <span class="scenario-tag">skills/semantic-git-hook-guard/</span>
-            <span class="scenario-tag">Skeleton · agent-driven</span>
+            <span class="scenario-tag">skills/semantic-commit-guard/</span>
+            <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + install-hook.sh</span>
           </div>
         </div>
 
-        <div class="skill-path">skills/semantic-git-hook-guard/SKILL.md</div>
+        <div class="skill-path">skills/semantic-commit-guard/SKILL.md + scripts/install-hook.sh</div>
       </div>
 
       <div class="video-demo reveal">
@@ -2083,7 +2328,7 @@
           </div>
         </div>
         <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-header">Try in Cursor · demo-repos/commit-guard-demo/</div>
           <div class="demo-prompt-body">
             <em>"Run the Semantic Commit Guard on my staged changes. Block anything that violates security or contradicts our docs."</em>
           </div>
@@ -2116,7 +2361,7 @@
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-search"/></svg></span></div>
           <div>
-            <div class="skill-act">Act II · Diagnose · The Detective</div>
+            <div class="skill-act">Skill II · Diagnose · The Detective</div>
             <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/git-bisect-ai/</div>
           </div>
         </div>
@@ -2140,9 +2385,9 @@
         </div>
 
         <div class="story-block">
-          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · shopcart discount bug</div>
-          <p><code style="font-family:var(--mono);font-size:0.82em">total([(100.0, 1)], discount_percent=10)</code> should return <strong>90.0</strong>. Returns <strong>-900.0</strong>. Commit <code style="font-family:var(--mono);font-size:0.82em">7781fab</code> "Simplify apply_discount" dropped the <code style="font-family:var(--mono);font-size:0.82em">/100</code>.</p>
-          <p>Good: <code style="font-family:var(--mono);font-size:0.82em">b5f65ee</code> (May 26). Bad: <code style="font-family:var(--mono);font-size:0.82em">HEAD</code>. Agent bisects ~20 commits in ~5 steps. No guard. No deps. Pure detective work.</p>
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · bisect-demo</div>
+          <p><code style="font-family:var(--mono);font-size:0.82em">multiply(4, 5)</code> should return <strong>20</strong>. Returns <strong>9</strong>. A commit "Optimize multiply for readability" quietly turned <code style="font-family:var(--mono);font-size:0.82em">a * b</code> into <code style="font-family:var(--mono);font-size:0.82em">a + b</code>.</p>
+          <p>Good: tag <code style="font-family:var(--mono);font-size:0.82em">v1.0</code>. Bad: <code style="font-family:var(--mono);font-size:0.82em">HEAD</code>. Agent binary-searches the history in a handful of steps. No guard. No deps. Pure detective work.</p>
           <div class="scenario-tags">
             <span class="scenario-tag">skills/git-bisect-ai/</span>
             <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + bisect-run.sh</span>
@@ -2161,24 +2406,23 @@
             <span class="terminal-title">git-bisect-ai</span>
           </div>
           <div class="skill-terminal-body">
-            <div><span class="t-prompt">$</span> git bisect start HEAD b5f65ee</div>
+            <div><span class="t-prompt">$</span> git bisect start HEAD v1.0</div>
             <div><span class="t-prompt">$</span> git bisect run bisect-run.sh \</div>
-            <div class="t-dim">    --test "python3 -c '...discount...'"</div>
+            <div class="t-dim">    --test "python3 -c '...multiply...'"</div>
             <br>
-            <div class="t-out">Bisecting: 5 revisions left...</div>
-            <div class="t-out">Bisecting: 2 revisions left...</div>
-            <div class="t-out">7781fab is the first bad commit</div>
+            <div class="t-out">Bisecting: 1 revision left...</div>
+            <div class="t-out">440f09c is the first bad commit</div>
             <br>
-            <div><span class="t-prompt">culprit&gt;</span> "Simplify apply_discount"</div>
-            <div class="t-err">- return amount * (1 - percent / 100)</div>
-            <div class="t-err">+ return amount * (1 - percent)  // oops</div>
-            <div class="t-dim">// finance can use numbers again</div>
+            <div><span class="t-prompt">culprit&gt;</span> "Optimize multiply for readability"</div>
+            <div class="t-err">- return a * b</div>
+            <div class="t-err">+ return a + b  // oops</div>
+            <div class="t-dim">// multiply does math again</div>
           </div>
         </div>
         <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-header">Try in Cursor · demo-repos/bisect-demo/</div>
           <div class="demo-prompt-body">
-            <em>"The discount math broke sometime this week — it worked on the 26th. Bisect and find the commit."</em>
+            <em>"multiply broke since the v1.0 release — bisect and find the commit that did it."</em>
           </div>
         </div>
         <div class="video-label">
@@ -2191,8 +2435,8 @@
           </video>
           <div class="video-placeholder">
             <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
-            <h4 class="heading-card">Demo: Finding the discount regression</h4>
-            <p>Watch the agent bisect 20+ commits and pinpoint the exact line that broke math.</p>
+            <h4 class="heading-card">Demo: Finding the multiply regression</h4>
+            <p>Watch the agent bisect the history and pinpoint the exact line that broke math.</p>
           </div>
         </div>
         <p class="video-hint">
@@ -2202,19 +2446,19 @@
     </div>
   </section>
 
-  <!-- ═══════════════════ SKILL 3: RESURRECT ═══════════════════ -->
-  <section class="skill-section recover" id="resurrect">
+  <!-- ═══════════════════ SKILL 3: DEPENDENCY UPGRADE LOOP ═══════════════════ -->
+  <section class="skill-section recover" id="upgrade-loop">
     <div class="container skill-layout">
       <div class="skill-content reveal">
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-bolt"/></svg></span></div>
           <div>
-            <div class="skill-act">Act III · Recover · The Exorcist</div>
-            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/dependency-graveyard-resurrection/</div>
+            <div class="skill-act">Skill III · Recover · Dependency Upgrade Loop</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)">skills/dependency-upgrade-loop/</div>
           </div>
         </div>
-        <h2 class="heading-section">Dependency Resurrection Engine</h2>
-        <p class="skill-tagline">"The graveyard isn't permanent. Neither is your build. Probably."</p>
+        <h2 class="heading-section">Dependency Upgrade Loop</h2>
+        <p class="skill-tagline">"Old dependency stacks fail one boundary at a time. Fix them the same way."</p>
 
         <div class="skill-detail-block">
           <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
@@ -2234,14 +2478,14 @@
         <div class="story-block">
           <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · pydantic v1 → v2</div>
           <p><code style="font-family:var(--mono);font-size:0.82em">requirements.txt</code> pins Flask 1.1, pydantic 1.10, requests 2.22. Code imports <code style="font-family:var(--mono);font-size:0.82em">BaseSettings</code> from pydantic — removed in v2, moved to <code style="font-family:var(--mono);font-size:0.82em">pydantic-settings</code>.</p>
-          <p>Engine bumps pins, adds missing package, rewrites imports, retries until imports succeed. No bisect. No guard. Just exorcism.</p>
+          <p>The loop bumps pins, adds the missing package, rewrites imports, and retries until imports succeed. No bisect. No guard. Just the dependency-upgrade-loop skill.</p>
           <div class="scenario-tags">
-            <span class="scenario-tag">skills/dependency-graveyard-resurrection/</span>
-            <span class="scenario-tag">Skeleton · agent-driven</span>
+            <span class="scenario-tag">skills/dependency-upgrade-loop/</span>
+            <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + build-probe.sh</span>
           </div>
         </div>
 
-        <div class="skill-path">skills/dependency-graveyard-resurrection/SKILL.md</div>
+        <div class="skill-path">skills/dependency-upgrade-loop/SKILL.md + scripts/build-probe.sh</div>
       </div>
 
       <div class="video-demo reveal">
@@ -2250,42 +2494,42 @@
             <span class="terminal-dot"></span>
             <span class="terminal-dot"></span>
             <span class="terminal-dot"></span>
-            <span class="terminal-title">dependency-resurrection-engine</span>
+            <span class="terminal-title">dependency-upgrade-loop</span>
           </div>
           <div class="skill-terminal-body">
             <div><span class="t-prompt">$</span> pip install -r requirements.txt</div>
             <div class="t-err">ImportError: cannot import BaseSettings from pydantic</div>
             <br>
-            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">pydantic v2 moved BaseSettings → pydantic-settings</span></div>
-            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">adding pydantic-settings to manifest...</span></div>
-            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">rewriting config.py imports...</span></div>
-            <div><span class="t-prompt">engine&gt;</span> <span class="t-out">retry build...</span></div>
+            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">pydantic v2 moved BaseSettings → pydantic-settings</span></div>
+            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">adding pydantic-settings to manifest...</span></div>
+            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">rewriting config.py imports...</span></div>
+            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">retry build...</span></div>
             <br>
-            <div class="t-out t-line"><span class="icon icon--ok" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>build passes. ancient pins laid to rest.</div>
+            <div class="t-out t-line"><span class="icon icon--ok" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>build passes. upgrade loop complete.</div>
           </div>
         </div>
         <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · test-repo/</div>
+          <div class="demo-prompt-header">Try in Cursor · demo-repos/dependency-upgrade-loop-demo/</div>
           <div class="demo-prompt-body">
-            <em>"Run the Dependency Resurrection Engine. Upgrade this stack and fix every breaking change until it builds."</em>
+            <em>"Run the Dependency Upgrade Loop. Upgrade this stack and fix every breaking change until it builds."</em>
           </div>
         </div>
         <div class="video-label">
-          <span>Live Demo · Dependency Resurrection</span>
+          <span>Live Demo · Dependency Upgrade Loop</span>
           <span class="video-status" data-video-status>Awaiting file</span>
         </div>
-        <div class="video-frame" id="video-resurrect">
-          <video controls playsinline preload="metadata" poster="assets/demos/resurrect-poster.jpg">
-            <source src="assets/demos/resurrect-demo.mp4" type="video/mp4">
+        <div class="video-frame" id="video-upgrade-loop">
+          <video controls playsinline preload="metadata" poster="assets/demos/dependency-upgrade-loop-poster.jpg">
+            <source src="assets/demos/dependency-upgrade-loop-demo.mp4" type="video/mp4">
           </video>
           <div class="video-placeholder">
             <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
-            <h4 class="heading-card">Demo: Dragging pydantic out of the graveyard</h4>
+            <h4 class="heading-card">Demo: Migrating pydantic v1 APIs to v2</h4>
             <p>Watch the agent upgrade ancient pins and rewrite imports until the build passes.</p>
           </div>
         </div>
         <p class="video-hint">
-          Place your recording at <code>assets/demos/resurrect-demo.mp4</code> — the player appears automatically once the file is present.
+          Place your recording at <code>assets/demos/dependency-upgrade-loop-demo.mp4</code> — the player appears automatically once the file is present.
         </p>
       </div>
     </div>
@@ -2299,7 +2543,7 @@
       <div class="reveal">
         <p class="section-label">Get Started</p>
         <h2 class="heading-section">Try it in 60 seconds</h2>
-        <p>Copy the skills into any project. Open the included demo repo to rehearse all three scenarios before your hackathon presentation.</p>
+        <p>One clone, one top-level README, three isolated demos. Copy the skills into any project, then rehearse each scenario in its own sandbox — they're kept separate on purpose (see below).</p>
 
         <ol class="install-steps">
           <li>
@@ -2310,14 +2554,14 @@
           </li>
           <li>
             <div>
-              <strong>Open the demo repo</strong>
-              <span>Navigate to <code style="font-family:var(--mono);font-size:0.82em">test-repo/</code> — a separate git repo with planted bugs for each skill.</span>
+              <strong>Pick a demo and run its setup</strong>
+              <span>Each skill gets its own sandbox under <code style="font-family:var(--mono);font-size:0.82em">demo-repos/</code>. Run that demo's <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> to materialize a throwaway git repo in exactly the broken state that skill needs. Re-run it any time to reset.</span>
             </div>
           </li>
           <li>
             <div>
               <strong>Run the prompts</strong>
-              <span>Use the demo prompts from each skill section above. Record your screen for the video slots.</span>
+              <span>Each <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> prints the prompt to hand the agent and the manual commands to drive it yourself. Record your screen for the video slots.</span>
             </div>
           </li>
         </ol>
@@ -2332,12 +2576,18 @@
           <pre id="install-cmd"><span class="comment"># Copy skills into your project (pick your agent's folder)</span>
 <span class="cmd">mkdir</span> -p <span class="path">YOUR_PROJECT/.cursor/skills</span>
 <span class="cmd">cp</span> -r skills/git-bisect-ai           <span class="path">YOUR_PROJECT/.cursor/skills/</span>
-<span class="cmd">cp</span> -r skills/semantic-git-hook-guard <span class="path">YOUR_PROJECT/.cursor/skills/</span>
-<span class="cmd">cp</span> -r skills/dependency-graveyard-resurrection <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+<span class="cmd">cp</span> -r skills/semantic-commit-guard <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+<span class="cmd">cp</span> -r skills/dependency-upgrade-loop <span class="path">YOUR_PROJECT/.cursor/skills/</span>
 
-<span class="comment"># Run demos from the included test repo</span>
-<span class="cmd">cd</span> test-repo
-<span class="cmd">cat</span> DEMO.md</pre>
+<span class="comment"># One umbrella repo, three isolated demo sandboxes</span>
+<span class="path">demo-repos/</span>
+<span class="comment">├─ bisect-demo/           # planted regression in a clean git history</span>
+<span class="comment">├─ commit-guard-demo/     # a secret + a docs lie, staged & ready to block</span>
+<span class="comment">└─ dependency-upgrade-loop-demo/ # a stack frozen on dead dependency versions</span>
+
+<span class="comment"># Spin up one demo (re-run to reset it)</span>
+<span class="cmd">cd</span> demo-repos/bisect-demo
+<span class="cmd">bash</span> setup.sh</pre>
         </div>
       </div>
     </div>
@@ -2350,25 +2600,31 @@
       <div class="faq-list reveal">
         <details class="faq-item">
           <summary>How is this different from regular linting or CI?</summary>
-          <p>Linters check syntax and style. CI runs after the fact. Semantic Commit Guard evaluates the <em>meaning</em> of changes — catching doc/code contradictions and security intent violations that no regex rule covers. Git Bisect AI and Dependency Resurrection go further: they perform multi-step autonomous workflows that would take an engineer hours manually.</p>
+          <p>Linters check syntax and style. CI runs after the fact. Semantic Commit Guard evaluates the <em>meaning</em> of changes — catching doc/code contradictions and security intent violations that no regex rule covers. Git Bisect AI and Dependency Upgrade Loop go further: they perform multi-step autonomous workflows that would take an engineer hours manually.</p>
         </details>
         <details class="faq-item">
           <summary>Do I need to install anything?</summary>
-          <p>No. Skills are plain Markdown in <code style="font-family:var(--mono);font-size:0.82em">skills/</code> — copy the folders into <code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>, <code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code> and your agent picks them up automatically. Git Bisect AI includes a working shell script (<code style="font-family:var(--mono);font-size:0.82em">bisect-run.sh</code>); the other two are skill definitions the agent follows directly.</p>
+          <p>No. Skills are plain Markdown in <code style="font-family:var(--mono);font-size:0.82em">skills/</code> — copy the folders into <code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>, <code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code> and your agent picks them up automatically. Each skill also ships a helper script the agent drives — <code style="font-family:var(--mono);font-size:0.82em">bisect-run.sh</code>, <code style="font-family:var(--mono);font-size:0.82em">install-hook.sh</code>, and <code style="font-family:var(--mono);font-size:0.82em">build-probe.sh</code> — resolved automatically at runtime.</p>
         </details>
   
         <details class="faq-item">
           <summary>Can these work outside Cursor?</summary>
           <p>These skills follow the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> format. The same <code style="font-family:var(--mono);font-size:0.82em">SKILL.md</code> works in Cursor, Claude Code, Codex, and other compatible agents — only the install directory differs.</p>
         </details>
+
+        <details class="faq-item">
+          <summary>Why three separate demo repos instead of one?</summary>
+          <p>Because each skill needs a starting state that <em>contradicts</em> the others. Bisect wants a clean history that passes at the good commit; the guard wants a dirty, staged diff to block; dependency-upgrade-loop wants a build that's broken from the start. Cram them into one repo and a visitor can't tell which "brokenness" belongs to which skill — and the dependency mess pollutes the bisect history. So they live as isolated sandboxes under one umbrella repo: <strong>single clone, one top-level README, three independent demo dirs</strong>, each reset by its own <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code>.</p>
+        </details>
       </div>
     </div>
   </section>
 
+
   <!-- ═══════════════════ FOOTER ═══════════════════ -->
   <footer class="footer">
     <div class="container">
-      <p><strong>Repo Rescue Rangers</strong> · Hackathon Project · Agent Skills</p>
+      <p><strong>Repo Rescue Rangers</strong> · UCWS Singapore Hackathon 2026 · Agent Skills</p>
       <p style="margin-top:8px">Prevent · Diagnose · Recover — fewer meetings about one missing slash.</p>
   
     </div>
@@ -2454,7 +2710,7 @@
         note: 'The guard is allergic to secrets and false confidence.',
         logs: [
           'semantic-commit-guard scans staged changes',
-          'found STRIPE_LIVE_KEY in shopcart/config.py:12',
+          'found sk-live-... API_KEY in app/config.py',
           'README contradiction detected: "no secrets are stored"',
           'verdict: commit rejected before main learns new vocabulary'
         ],
@@ -2464,14 +2720,14 @@
         label: 'Scenario 02',
         status: 'Panic: 88%',
         panic: 88,
-        title: 'The discount function invented negative revenue.',
-        before: 'A 10% discount returns -900.0. Finance has stopped using punctuation and started using silence.',
+        title: 'The multiply function forgot how to multiply.',
+        before: 'multiply(4, 5) returns 9 instead of 20. Every total downstream is quietly wrong and nobody knows since when.',
         note: 'The detective brings receipts, commit hashes, and math.',
         logs: [
-          'git-bisect-ai confirms good commit b5f65ee',
-          'repro: total([(100.0, 1)], discount_percent=10)',
-          'bisect run isolates 7781fab: "Simplify apply_discount"',
-          'culprit: removed /100 and gave discounts executive authority'
+          'git-bisect-ai confirms good commit tag v1.0',
+          'repro: multiply(4, 5) == 20  (exit 0 = good)',
+          'bisect run isolates 440f09c: "Optimize multiply for readability"',
+          'culprit: changed a * b into a + b'
         ],
         stack: ['Bisect bounds verified', 'Culprit commit found', 'Diff explained']
       },
@@ -2483,7 +2739,7 @@
         before: 'Flask is vintage, pydantic moved the furniture, and the import errors are filing noise complaints.',
         note: 'The engine upgrades, retries, and refuses to be impressed by stack traces.',
         logs: [
-          'dependency-resurrection-engine parses requirements.txt',
+          'dependency-upgrade-loop parses requirements.txt',
           'pydantic BaseSettings moved to pydantic-settings',
           'rewrite imports, add missing package, rerun build',
           'build passes; ancient pins receive a respectful farewell'
@@ -2500,7 +2756,7 @@
         logs: [
           'guard rejects the secret and the optimistic README',
           'bisect identifies the exact math regression commit',
-          'resurrection engine modernizes the dependency pile',
+          'dependency-upgrade-loop modernizes the dependency pile',
           'status: fewer alarms, fewer theories, more lunch'
         ],
         stack: ['Prevent', 'Diagnose', 'Recover', 'Postmortem avoided']
