@@ -1309,37 +1309,6 @@
       word-break: break-all;
     }
 
-    .skill-details-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--skill);
-      text-decoration: none;
-      padding: 11px 20px;
-      border-radius: 999px;
-      border: 1px solid color-mix(in srgb, var(--skill) 35%, var(--border));
-      background: var(--skill-dim);
-      transition: transform 150ms var(--ease), box-shadow 150ms, background 150ms;
-    }
-
-    .skill-details-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px var(--skill-glow);
-      background: color-mix(in srgb, var(--skill) 22%, transparent);
-    }
-
-    .skill-details-link .icon {
-      width: 16px;
-      height: 16px;
-      transition: transform 150ms var(--ease);
-    }
-
-    .skill-details-link:hover .icon { transform: translateX(3px); }
-
     /* ── Video demo ── */
     .video-demo {
       position: sticky;
@@ -1521,6 +1490,83 @@
     }
 
     .demo-prompt-body em { color: var(--skill); font-style: normal; }
+
+    /* ── Top demo (single video) ── */
+    .top-demo {
+      padding: 80px 0;
+      background: var(--bg-elevated);
+      border-block: 1px solid var(--border);
+    }
+
+    .top-demo-frame {
+      position: relative;
+      max-width: 900px;
+      margin-inline: auto;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    }
+
+    .top-demo-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* ── Skill section (demo column removed) ── */
+    .skill-solo {
+      max-width: 1080px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 4vw, 40px);
+    }
+
+    .skill-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .skill-detail-grid > .skill-detail-block { margin-bottom: 0; }
+
+    @media (max-width: 760px) {
+      .skill-detail-grid { grid-template-columns: 1fr; }
+    }
+
+    .skill-howlink {
+      display: flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      margin: 26px auto 0;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #050508;
+      background: var(--skill);
+      text-decoration: none;
+      box-shadow: 0 10px 30px var(--skill-glow);
+      transition: transform 150ms var(--ease), box-shadow 150ms;
+    }
+
+    .skill-howlink::after {
+      content: "→";
+      font-weight: 700;
+      transition: transform 150ms var(--ease);
+    }
+
+    .skill-howlink:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 38px var(--skill-glow);
+    }
+
+    .skill-howlink:hover::after { transform: translateX(3px); }
 
     /* ── Impact dashboard ── */
     .impact-section {
@@ -2030,9 +2076,6 @@
     <symbol id="icon-search" viewBox="0 0 24 24">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
     </symbol>
-    <symbol id="icon-arrow" viewBox="0 0 24 24">
-      <path d="M5 12h14M13 6l6 6-6 6"/>
-    </symbol>
     <symbol id="icon-shield" viewBox="0 0 24 24">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
     </symbol>
@@ -2104,7 +2147,7 @@
        Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack. Fewer Monday apologies.
       </p>
       <div class="hero-actions">
-        <a href="#try-it" class="btn btn-primary">Copy the Escape Plan ↓</a>
+        <a href="#demo" class="btn btn-primary">See it in action ↓</a>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -2277,30 +2320,43 @@
           <h3 class="heading-card">The Bouncer</h3>
           <p class="skill-name">semantic-commit-guard</p>
           <p>Reads the <em>meaning</em> of staged changes — not just syntax. Blocks secrets, architecture violations, and doc/code contradictions before they enter history.</p>
-          <a href="#guard" class="pipeline-link">See demo →</a>
+          <a href="#guard" class="pipeline-link">Learn more →</a>
         </article>
         <article class="pipeline-card diagnose reveal">
           <p class="pipeline-phase">Act II · Diagnose</p>
           <h3 class="heading-card">The Detective</h3>
           <p class="skill-name">git-bisect-ai</p>
           <p>Turns "it broke last week" into "commit <code style="font-family:var(--mono);font-size:0.8em">a1b2c3d</code> did it, here's why." Fully automated <code style="font-family:var(--mono);font-size:0.8em">git bisect run</code>.</p>
-          <a href="#bisect" class="pipeline-link">See demo →</a>
+          <a href="#bisect" class="pipeline-link">Learn more →</a>
         </article>
         <article class="pipeline-card recover reveal">
           <p class="pipeline-phase">Act III · Recover</p>
           <h3 class="heading-card">The Upgrade Loop</h3>
           <p class="skill-name">dependency-upgrade-loop</p>
           <p>Parses manifests, cross-references changelogs, rewrites code for new APIs, and retries builds until the project compiles again.</p>
-          <a href="#upgrade-loop" class="pipeline-link">See demo →</a>
+          <a href="#upgrade-loop" class="pipeline-link">Learn more →</a>
         </article>
       </div>
     </div>
   </section>
 
 
+  <!-- ═══════════════════ DEMO ═══════════════════ -->
+  <section class="top-demo" id="demo">
+    <div class="container">
+      <div class="section-header section-header--center reveal">
+        <p class="section-label section-label--center">Watch it work</p>
+        <h2 class="heading-section">See the Rescue Rangers in action</h2>
+      </div>
+      <div class="top-demo-frame reveal">
+        <iframe src="https://www.youtube.com/embed/GP8Ed94plAw" title="Repo Rescue Rangers demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
   <!-- ═══════════════════ SKILL 1: GUARD ═══════════════════ -->
   <section class="skill-section prevent" id="guard">
-    <div class="container skill-layout">
+    <div class="skill-solo">
       <div class="skill-content reveal">
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-door"/></svg></span></div>
@@ -2312,19 +2368,21 @@
         <h2 class="heading-section">Semantic Commit Guard</h2>
         <p class="skill-tagline">"Lint catches typos. This catches intent — and lies."</p>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
-          <p>Pre-commit hooks check syntax. PR bots review after the damage. Neither catches "I committed a live API key AND updated the README to say we don't store secrets." That's a semantic problem — and it's how postmortems get born.</p>
-        </div>
+        <div class="skill-detail-grid">
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+            <p>Pre-commit hooks check syntax. PR bots review after the damage. Neither catches "I committed a live API key AND updated the README to say we don't store secrets." That's a semantic problem — and it's how postmortems get born.</p>
+          </div>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
-          <ol class="skill-steps">
-            <li>Agent reads your staged diff before commit finalizes</li>
-            <li>Scans for secret patterns, architecture violations, doc/code contradictions</li>
-            <li>Rejects with exact line numbers + fix guidance</li>
-            <li>You fix it. Main stays innocent. Weekend preserved.</li>
-          </ol>
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>See how it works</h3>
+            <ol class="skill-steps">
+              <li>Agent reads your staged diff before commit finalizes</li>
+              <li>Scans for secret patterns, architecture violations, doc/code contradictions</li>
+              <li>Rejects with exact line numbers + fix guidance</li>
+              <li>You fix it. Main stays innocent. Weekend preserved.</li>
+            </ol>
+          </div>
         </div>
 
         <div class="story-block">
@@ -2338,60 +2396,15 @@
         </div>
 
         <div class="skill-path">skills/semantic-commit-guard/SKILL.md + scripts/install-hook.sh</div>
-        <a class="skill-details-link" href="how-it-works.html#guard">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
-      </div>
 
-      <div class="video-demo reveal">
-        <div class="terminal-window" style="margin-bottom:20px">
-          <div class="terminal-chrome">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">semantic-commit-guard</span>
-          </div>
-          <div class="skill-terminal-body">
-            <div><span class="t-prompt">$</span> git diff --cached</div>
-            <div class="t-err">+ API_KEY = "sk-live-abc123..."</div>
-            <div class="t-err">+ DATABASE_PASSWORD = "hunter2"</div>
-            <div class="t-dim"> README.md: "No secrets are stored..."</div>
-            <br>
-            <div><span class="t-prompt">guard&gt;</span> <span class="t-out">SCANNING STAGED CHANGES...</span></div>
-            <div class="t-err t-line"><span class="icon icon--bad" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-x"/></svg></span>STRIPE_LIVE_KEY pattern in config.py:12</div>
-            <div class="t-err t-line"><span class="icon icon--bad" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-x"/></svg></span>README contradicts staged code</div>
-            <div><span class="t-prompt">verdict&gt;</span> <span class="t-out">COMMIT REJECTED</span></div>
-            <div class="t-dim">// main never learns your API key. you're welcome.</div>
-          </div>
-        </div>
-        <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · demo-repos/commit-guard-demo/</div>
-          <div class="demo-prompt-body">
-            <em>"Run the Semantic Commit Guard on my staged changes. Block anything that violates security or contradicts our docs."</em>
-          </div>
-        </div>
-        <div class="video-label">
-          <span>Live Demo · Semantic Commit Guard</span>
-          <span class="video-status" data-video-status>Awaiting file</span>
-        </div>
-        <div class="video-frame" id="video-guard">
-          <video controls playsinline preload="metadata" poster="assets/demos/guard-poster.jpg">
-            <source src="assets/demos/guard-demo.mp4" type="video/mp4">
-          </video>
-          <div class="video-placeholder">
-            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
-            <h4 class="heading-card">Demo: Blocking a secret + a docs lie</h4>
-            <p>Record the agent rejecting a commit with a live API key and a false security claim.</p>
-          </div>
-        </div>
-        <p class="video-hint">
-          Place your recording at <code>assets/demos/guard-demo.mp4</code> — the player appears automatically once the file is present.
-        </p>
+        <a href="how-it-works.html#guard" class="skill-howlink">See how it works</a>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════ SKILL 2: BISECT ═══════════════════ -->
   <section class="skill-section diagnose" id="bisect">
-    <div class="container skill-layout reverse">
+    <div class="skill-solo">
       <div class="skill-content reveal">
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-search"/></svg></span></div>
@@ -2403,20 +2416,22 @@
         <h2 class="heading-section">Git Bisect AI</h2>
         <p class="skill-tagline">"Forty-seven commits. One culprit. Five minutes. Zero blame roulette."</p>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
-          <p>"It broke last week" is not a commit hash. Manual git archaeology burns hours, produces theories, and occasionally blames the intern (incorrectly). Bisect binary-searches history — but setting it up correctly is fiddly. This skill automates the whole thing.</p>
-        </div>
+        <div class="skill-detail-grid">
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+            <p>"It broke last week" is not a commit hash. Manual git archaeology burns hours, produces theories, and occasionally blames the intern (incorrectly). Bisect binary-searches history — but setting it up correctly is fiddly. This skill automates the whole thing.</p>
+          </div>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
-          <ol class="skill-steps">
-            <li>Confirm good commit, bad commit, and a reproduction command (exit 0 = good, nonzero = bad)</li>
-            <li>Validate the repro on both bounds — garbage in, garbage out</li>
-            <li>Run <code style="font-family:var(--mono);font-size:0.85em">git bisect run</code> with the included <code style="font-family:var(--mono);font-size:0.85em">bisect-run.sh</code> wrapper</li>
-            <li>Report culprit SHA, full diff, and <em>why</em> that change broke things</li>
-            <li>Always reset bisect state. Always.</li>
-          </ol>
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>See how it works</h3>
+            <ol class="skill-steps">
+              <li>Confirm good commit, bad commit, and a reproduction command (exit 0 = good, nonzero = bad)</li>
+              <li>Validate the repro on both bounds — garbage in, garbage out</li>
+              <li>Run <code style="font-family:var(--mono);font-size:0.85em">git bisect run</code> with the included <code style="font-family:var(--mono);font-size:0.85em">bisect-run.sh</code> wrapper</li>
+              <li>Report culprit SHA, full diff, and <em>why</em> that change broke things</li>
+              <li>Always reset bisect state. Always.</li>
+            </ol>
+          </div>
         </div>
 
         <div class="story-block">
@@ -2430,61 +2445,15 @@
         </div>
 
         <div class="skill-path">skills/git-bisect-ai/SKILL.md + scripts/bisect-run.sh</div>
-        <a class="skill-details-link" href="how-it-works.html#bisect">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
-      </div>
 
-      <div class="video-demo reveal">
-        <div class="terminal-window" style="margin-bottom:20px">
-          <div class="terminal-chrome">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">git-bisect-ai</span>
-          </div>
-          <div class="skill-terminal-body">
-            <div><span class="t-prompt">$</span> git bisect start HEAD v1.0</div>
-            <div><span class="t-prompt">$</span> git bisect run bisect-run.sh \</div>
-            <div class="t-dim">    --test "python3 -c '...multiply...'"</div>
-            <br>
-            <div class="t-out">Bisecting: 1 revision left...</div>
-            <div class="t-out">440f09c is the first bad commit</div>
-            <br>
-            <div><span class="t-prompt">culprit&gt;</span> "Optimize multiply for readability"</div>
-            <div class="t-err">- return a * b</div>
-            <div class="t-err">+ return a + b  // oops</div>
-            <div class="t-dim">// multiply does math again</div>
-          </div>
-        </div>
-        <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · demo-repos/bisect-demo/</div>
-          <div class="demo-prompt-body">
-            <em>"multiply broke since the v1.0 release — bisect and find the commit that did it."</em>
-          </div>
-        </div>
-        <div class="video-label">
-          <span>Live Demo · Git Bisect AI</span>
-          <span class="video-status" data-video-status>Awaiting file</span>
-        </div>
-        <div class="video-frame" id="video-bisect">
-          <video controls playsinline preload="metadata" poster="assets/demos/bisect-poster.jpg">
-            <source src="assets/demos/bisect-demo.mp4" type="video/mp4">
-          </video>
-          <div class="video-placeholder">
-            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
-            <h4 class="heading-card">Demo: Finding the multiply regression</h4>
-            <p>Watch the agent bisect the history and pinpoint the exact line that broke math.</p>
-          </div>
-        </div>
-        <p class="video-hint">
-          Place your recording at <code>assets/demos/bisect-demo.mp4</code> — the player appears automatically once the file is present.
-        </p>
+        <a href="how-it-works.html#bisect" class="skill-howlink">See how it works</a>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════ SKILL 3: DEPENDENCY UPGRADE LOOP ═══════════════════ -->
   <section class="skill-section recover" id="upgrade-loop">
-    <div class="container skill-layout">
+    <div class="skill-solo">
       <div class="skill-content reveal">
         <div class="skill-meta">
           <div class="skill-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-bolt"/></svg></span></div>
@@ -2496,19 +2465,21 @@
         <h2 class="heading-section">Dependency Upgrade Loop</h2>
         <p class="skill-tagline">"Old dependency stacks fail one boundary at a time. Fix them the same way."</p>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
-          <p>Major upgrades cascade. Bump one package → three peer deps scream → import paths moved → you're reading changelogs at 2 AM. Most upgrade attempts die at the first compile error. This skill treats migration as a loop: build, fail, fix, retry, repeat.</p>
-        </div>
+        <div class="skill-detail-grid">
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
+            <p>Major upgrades cascade. Bump one package → three peer deps scream → import paths moved → you're reading changelogs at 2 AM. Most upgrade attempts die at the first compile error. This skill treats migration as a loop: build, fail, fix, retry, repeat.</p>
+          </div>
 
-        <div class="skill-detail-block">
-          <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>How it works</h3>
-          <ol class="skill-steps">
-            <li>Parse manifests (<code style="font-family:var(--mono);font-size:0.85em">package.json</code>, <code style="font-family:var(--mono);font-size:0.85em">requirements.txt</code>, etc.)</li>
-            <li>Cross-reference changelogs, upgrade notes, error databases</li>
-            <li>Run build → analyze failure → rewrite affected code → bump deps → retry</li>
-            <li>Continue until build passes or upgrade boundaries are identified</li>
-          </ol>
+          <div class="skill-detail-block">
+            <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>See how it works</h3>
+            <ol class="skill-steps">
+              <li>Parse manifests (<code style="font-family:var(--mono);font-size:0.85em">package.json</code>, <code style="font-family:var(--mono);font-size:0.85em">requirements.txt</code>, etc.)</li>
+              <li>Cross-reference changelogs, upgrade notes, error databases</li>
+              <li>Run build → analyze failure → rewrite affected code → bump deps → retry</li>
+              <li>Continue until build passes or upgrade boundaries are identified</li>
+            </ol>
+          </div>
         </div>
 
         <div class="story-block">
@@ -2522,52 +2493,8 @@
         </div>
 
         <div class="skill-path">skills/dependency-upgrade-loop/SKILL.md + scripts/build-probe.sh</div>
-        <a class="skill-details-link" href="how-it-works.html#upgrade-loop">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
-      </div>
 
-      <div class="video-demo reveal">
-        <div class="terminal-window" style="margin-bottom:20px">
-          <div class="terminal-chrome">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">dependency-upgrade-loop</span>
-          </div>
-          <div class="skill-terminal-body">
-            <div><span class="t-prompt">$</span> pip install -r requirements.txt</div>
-            <div class="t-err">ImportError: cannot import BaseSettings from pydantic</div>
-            <br>
-            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">pydantic v2 moved BaseSettings → pydantic-settings</span></div>
-            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">adding pydantic-settings to manifest...</span></div>
-            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">rewriting config.py imports...</span></div>
-            <div><span class="t-prompt">loop&gt;</span> <span class="t-out">retry build...</span></div>
-            <br>
-            <div class="t-out t-line"><span class="icon icon--ok" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>build passes. upgrade loop complete.</div>
-          </div>
-        </div>
-        <div class="demo-prompt" style="margin-bottom:20px">
-          <div class="demo-prompt-header">Try in Cursor · demo-repos/dependency-upgrade-loop-demo/</div>
-          <div class="demo-prompt-body">
-            <em>"Run the Dependency Upgrade Loop. Upgrade this stack and fix every breaking change until it builds."</em>
-          </div>
-        </div>
-        <div class="video-label">
-          <span>Live Demo · Dependency Upgrade Loop</span>
-          <span class="video-status" data-video-status>Awaiting file</span>
-        </div>
-        <div class="video-frame" id="video-upgrade-loop">
-          <video controls playsinline preload="metadata" poster="assets/demos/dependency-upgrade-loop-poster.jpg">
-            <source src="assets/demos/dependency-upgrade-loop-demo.mp4" type="video/mp4">
-          </video>
-          <div class="video-placeholder">
-            <div class="video-play-icon"><span class="icon icon--fill" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-play"/></svg></span></div>
-            <h4 class="heading-card">Demo: Migrating pydantic v1 APIs to v2</h4>
-            <p>Watch the agent upgrade ancient pins and rewrite imports until the build passes.</p>
-          </div>
-        </div>
-        <p class="video-hint">
-          Place your recording at <code>assets/demos/dependency-upgrade-loop-demo.mp4</code> — the player appears automatically once the file is present.
-        </p>
+        <a href="how-it-works.html#upgrade-loop" class="skill-howlink">See how it works</a>
       </div>
     </div>
   </section>
@@ -2598,7 +2525,7 @@
           <li>
             <div>
               <strong>Run the prompts</strong>
-              <span>Each <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> prints the prompt to hand the agent and the manual commands to drive it yourself. Record your screen for the video slots.</span>
+              <span>Each <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> prints the prompt to hand the agent and the manual commands to drive it yourself.</span>
             </div>
           </li>
         </ol>
@@ -2879,26 +2806,6 @@
     });
 
     updateIncidentScenario(activeScenario);
-
-    // Local MP4: show player when file loads, keep placeholder on missing file
-    document.querySelectorAll('.video-frame video').forEach(video => {
-      const frame = video.closest('.video-frame');
-      const demo = frame?.closest('.video-demo');
-      const status = demo?.querySelector('[data-video-status]');
-      const hint = demo?.querySelector('.video-hint');
-
-      const activate = () => {
-        frame.classList.add('has-video');
-        if (status) status.textContent = 'Ready';
-        if (hint) hint.hidden = true;
-      };
-
-      video.addEventListener('loadeddata', activate, { once: true });
-      video.addEventListener('error', () => {
-        if (status) status.textContent = 'Awaiting file';
-      }, { once: true });
-      video.load();
-    });
   </script>
 </body>
 </html>
