@@ -1309,6 +1309,37 @@
       word-break: break-all;
     }
 
+    .skill-details-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--skill);
+      text-decoration: none;
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--skill) 35%, var(--border));
+      background: var(--skill-dim);
+      transition: transform 150ms var(--ease), box-shadow 150ms, background 150ms;
+    }
+
+    .skill-details-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px var(--skill-glow);
+      background: color-mix(in srgb, var(--skill) 22%, transparent);
+    }
+
+    .skill-details-link .icon {
+      width: 16px;
+      height: 16px;
+      transition: transform 150ms var(--ease);
+    }
+
+    .skill-details-link:hover .icon { transform: translateX(3px); }
+
     /* ── Video demo ── */
     .video-demo {
       position: sticky;
@@ -1999,6 +2030,9 @@
     <symbol id="icon-search" viewBox="0 0 24 24">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
     </symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6"/>
+    </symbol>
     <symbol id="icon-shield" viewBox="0 0 24 24">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
     </symbol>
@@ -2304,6 +2338,7 @@
         </div>
 
         <div class="skill-path">skills/semantic-commit-guard/SKILL.md + scripts/install-hook.sh</div>
+        <a class="skill-details-link" href="how-it-works.html#guard">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
       </div>
 
       <div class="video-demo reveal">
@@ -2395,6 +2430,7 @@
         </div>
 
         <div class="skill-path">skills/git-bisect-ai/SKILL.md + scripts/bisect-run.sh</div>
+        <a class="skill-details-link" href="how-it-works.html#bisect">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
       </div>
 
       <div class="video-demo reveal">
@@ -2486,6 +2522,7 @@
         </div>
 
         <div class="skill-path">skills/dependency-upgrade-loop/SKILL.md + scripts/build-probe.sh</div>
+        <a class="skill-details-link" href="how-it-works.html#upgrade-loop">See more details<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
       </div>
 
       <div class="video-demo reveal">

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How the Repo Rescue Rangers skills work — a plain-language deep dive into the mechanics behind Semantic Commit Guard, Git Bisect AI, and the Dependency Upgrade Loop." />
+  <title>How It Works · Repo Rescue Rangers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --bg-elevated: #0c0d12;
+      --bg-card: #111318;
+      --text: #fafafa;
+      --text-soft: #9ca3af;
+      --text-muted: #6b7280;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.16);
+
+      --prevent: #34d399;
+      --prevent-dim: rgba(52, 211, 153, 0.14);
+      --prevent-glow: rgba(52, 211, 153, 0.40);
+
+      --diagnose: #38bdf8;
+      --diagnose-dim: rgba(56, 189, 248, 0.14);
+      --diagnose-glow: rgba(56, 189, 248, 0.40);
+
+      --recover: #c084fc;
+      --recover-dim: rgba(192, 132, 252, 0.14);
+      --recover-glow: rgba(192, 132, 252, 0.40);
+
+      --accent: #f97316;
+      --accent-dim: rgba(249, 115, 22, 0.16);
+      --danger: #f87171;
+      --warn: #fbbf24;
+
+      --display: "Syne", system-ui, sans-serif;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: smooth; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--accent); color: #000; }
+
+    a { color: inherit; }
+
+    .container {
+      max-width: 920px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 4vw, 40px);
+    }
+
+    section[id] { scroll-margin-top: 84px; }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 45%, var(--diagnose) 80%, var(--recover) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(8, 9, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 920px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      gap: 16px;
+    }
+
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color 150ms;
+    }
+
+    .nav-back:hover { color: var(--text); }
+
+    .nav-jump {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-jump a {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      transition: color 150ms, border-color 150ms, background 150ms;
+    }
+
+    .nav-jump a.j-prevent:hover { color: var(--prevent); border-color: color-mix(in srgb, var(--prevent) 40%, transparent); }
+    .nav-jump a.j-diagnose:hover { color: var(--diagnose); border-color: color-mix(in srgb, var(--diagnose) 40%, transparent); }
+    .nav-jump a.j-recover:hover { color: var(--recover); border-color: color-mix(in srgb, var(--recover) 40%, transparent); }
+
+    @media (max-width: 680px) {
+      .nav-jump { display: none; }
+    }
+
+    /* ── Hero ── */
+    .page-hero {
+      position: relative;
+      padding: 132px 0 56px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 15% 0%, var(--prevent-dim), transparent 55%),
+        radial-gradient(ellipse 55% 45% at 85% 10%, var(--diagnose-dim), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, var(--recover-dim), transparent 60%);
+    }
+
+    .page-hero .container { position: relative; }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+
+    .page-title {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 5vw, 3.1rem);
+      font-weight: 600;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+
+    .page-lede {
+      font-size: clamp(1.02rem, 2vw, 1.15rem);
+      color: var(--text-soft);
+      max-width: 640px;
+      line-height: 1.65;
+    }
+
+    /* ── Skill chapters ── */
+    .chapter {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter.prevent { --skill: var(--prevent); --skill-dim: var(--prevent-dim); --skill-glow: var(--prevent-glow); }
+    .chapter.diagnose { --skill: var(--diagnose); --skill-dim: var(--diagnose-dim); --skill-glow: var(--diagnose-glow); }
+    .chapter.recover { --skill: var(--recover); --skill-dim: var(--recover-dim); --skill-glow: var(--recover-glow); }
+
+    .chapter-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .chapter-icon {
+      width: 48px; height: 48px;
+      border-radius: 13px;
+      background: var(--skill-dim);
+      border: 1px solid color-mix(in srgb, var(--skill) 32%, transparent);
+      display: grid;
+      place-items: center;
+      color: var(--skill);
+      flex-shrink: 0;
+      box-shadow: 0 0 40px var(--skill-glow);
+    }
+
+    .chapter-icon .icon { width: 24px; height: 24px; }
+
+    .chapter-phase {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--skill);
+    }
+
+    .chapter-name {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3.4vw, 2.05rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .chapter-tagline {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-soft);
+      padding-left: 16px;
+      border-left: 3px solid var(--skill);
+      margin: 22px 0 36px;
+    }
+
+    h3.block-title {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 40px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3.block-title::before {
+      content: "";
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      background: var(--skill);
+      flex-shrink: 0;
+    }
+
+    .chapter p { color: var(--text-soft); margin-bottom: 16px; }
+    .chapter p strong { color: var(--text); font-weight: 600; }
+    .chapter p code, li code, td code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      color: var(--skill);
+      background: rgba(255,255,255,0.04);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    .lead-in {
+      font-size: 1.06rem;
+      color: var(--text) !important;
+    }
+
+    /* numbered steps */
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 8px 0 16px;
+    }
+
+    .steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 16px 18px 16px 56px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    .steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 16px;
+      top: 15px;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      background: var(--skill-dim);
+      color: var(--skill);
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 0.78rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps > li strong { color: var(--text); }
+
+    /* callout */
+    .callout {
+      background: linear-gradient(135deg, var(--skill-dim), transparent 80%), var(--bg-card);
+      border: 1px solid color-mix(in srgb, var(--skill) 28%, var(--border));
+      border-left: 3px solid var(--skill);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      margin: 20px 0;
+    }
+
+    .callout-label {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--skill);
+      margin-bottom: 8px;
+    }
+
+    .callout p { margin-bottom: 0; color: var(--text-soft); }
+    .callout p strong { color: var(--text); }
+
+    /* code block */
+    .code {
+      background: #07080b;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-soft);
+      overflow-x: auto;
+      margin: 16px 0;
+      white-space: pre;
+    }
+
+    .code .c-cmd { color: var(--prevent); }
+    .code .c-out { color: var(--diagnose); }
+    .code .c-err { color: var(--danger); }
+    .code .c-ok { color: var(--prevent); }
+    .code .c-dim { color: var(--text-muted); }
+
+    /* tables */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 480px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    td { color: var(--text-soft); }
+    td strong { color: var(--text); }
+
+    .sev {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .sev.block { color: var(--danger); background: rgba(248,113,113,0.14); border: 1px solid rgba(248,113,113,0.3); }
+    .sev.warn { color: var(--warn); background: rgba(251,191,36,0.13); border: 1px solid rgba(251,191,36,0.3); }
+    .sev.skip { color: var(--text-soft); background: rgba(255,255,255,0.06); border: 1px solid var(--border); }
+
+    ul.plain { list-style: none; margin: 8px 0 16px; }
+    ul.plain li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 10px;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+    ul.plain li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--skill);
+      font-family: var(--mono);
+    }
+
+    .try-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 30px;
+      padding: 18px 20px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .try-strip .label {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .try-strip code {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--skill);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 7px;
+    }
+
+    /* back-to-top / footer */
+    .page-foot {
+      padding: 56px 0 80px;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 13px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: transform 150ms var(--ease), box-shadow 150ms;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,255,255,0.12);
+    }
+
+    .page-foot p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 18px;
+    }
+
+    .icon { display: block; line-height: 0; flex-shrink: 0; }
+    .icon svg {
+      display: block; width: 100%; height: 100%;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- icon defs -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="icon-door" viewBox="0 0 24 24"><path d="M3 21h18M6 21V4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v17M18 21V8l-3-3"/><circle cx="11" cy="12" r="1"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3 8-8 9-5-1-8-4.5-8-9V7z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </svg>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="nav-back" href="skills-landing.html"><span class="icon" style="width:16px;height:16px;transform:scaleX(-1)" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span>Back to overview</a>
+      <div class="nav-jump">
+        <a class="j-prevent" href="#guard">Commit Guard</a>
+        <a class="j-diagnose" href="#bisect">Git Bisect</a>
+        <a class="j-recover" href="#upgrade-loop">Upgrade Loop</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-hero">
+    <div class="page-hero-bg"></div>
+    <div class="container">
+      <div class="eyebrow">How it works · Under the hood</div>
+      <h1 class="page-title">The mechanics behind the <span class="text-gradient">Rescue Rangers</span></h1>
+      <p class="page-lede">A plain-language deep dive into how each skill actually thinks — the exact commands it runs, the decisions it makes, and the moment it blocks, finds, or fixes the thing that would have wrecked your week.</p>
+    </div>
+  </header>
+
+  <!-- ════════════ SEMANTIC COMMIT GUARD ════════════ -->
+  <section class="chapter prevent" id="guard">
+    <div class="container">
+      <div class="chapter-head">
+        <div class="chapter-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-door"/></svg></span></div>
+        <div>
+          <div class="chapter-phase">Prevent · The Bouncer</div>
+          <div class="chapter-name">Semantic Commit Guard</div>
+        </div>
+      </div>
+      <p class="chapter-tagline">"Lint checks form. This checks meaning — and lies."</p>
+
+      <p class="lead-in">Linters and <code>pre-commit</code> check <em>form</em>: syntax, formatting, style. They can't tell that a line <em>means</em> "production password," or that logic landed in the wrong layer, or that your README started contradicting your code. This skill is the missing <strong>judgment layer</strong>. It reads the staged diff and reasons about what the change actually does.</p>
+
+      <div class="callout">
+        <div class="callout-label">The core trick</div>
+        <p>It only ever looks at the <strong>staged snapshot</strong> (<code>git diff --cached</code>) — the exact thing about to become a commit — never your messy working tree. It judges what you're really committing, nothing more.</p>
+      </div>
+
+      <h3 class="block-title">Two modes, same checks</h3>
+      <p>There are really two guards. The <strong>on-demand review</strong> is the agent reading your diff and reasoning about it. The optional <strong>installed hook</strong> is a fast, deterministic script that catches the crude disasters automatically on every commit. They're a team — neither replaces the other.</p>
+
+      <h3 class="block-title">How the on-demand review works</h3>
+      <p>It follows a fixed five-step workflow. Here's what it actually runs:</p>
+      <ol class="steps">
+        <li><strong>Is there anything to review?</strong> Runs <code>git diff --cached --stat</code> and finds the repo root. If nothing's staged, it stops — there's nothing to guard.</li>
+        <li><strong>Load <em>your</em> policy.</strong> This is the key step. It looks for your rules in priority order: <code>.semantic-guard.md</code>, then <code>AGENTS.md</code>/<code>CLAUDE.md</code>/<code>CONTRIBUTING.md</code>, then lint configs, then built-in defaults. A written rule like "handlers must not touch the DB" is what turns an opinion into an enforceable verdict.</li>
+        <li><strong>Collect evidence with exact line numbers.</strong> Uses <code>git diff --cached -U0</code> to strip context so every added line maps to a precise <code>file:line</code> it can cite.</li>
+        <li><strong>Run the four checks</strong> over every changed line (below).</li>
+        <li><strong>Deliver a verdict + receipt.</strong> Leads with <code>PASS</code>/<code>BLOCK</code>/<code>WARN</code>, lists each finding with a concrete fix, writes a Rescue Receipt, then stops. It never edits, unstages, or commits — blocking means <em>reporting</em>; you stay in control.</li>
+      </ol>
+
+      <h3 class="block-title">The four checks</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Check</th><th>What it hunts</th><th>Severity</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Secrets</strong></td><td>API keys, tokens, passwords, private keys, inline <code>.env</code> values</td><td><span class="sev block">BLOCK</span> if plausibly live</td></tr>
+            <tr><td><strong>Architecture</strong></td><td>Violations of <em>your loaded policy</em> — logic in the wrong layer, banned imports, bypassed abstractions</td><td><span class="sev block">BLOCK</span> w/ policy · <span class="sev warn">WARN</span> if a hunch</td></tr>
+            <tr><td><strong>Docs-sync</strong></td><td>Docstrings, READMEs, or comments that no longer match the changed behavior</td><td><span class="sev warn">WARN</span></td></tr>
+            <tr><td><strong>Risk smells</strong></td><td>Debug prints, commented-out code, disabled tests, broad exception swallowing, accidental large files</td><td><span class="sev warn">WARN</span> · <span class="sev block">BLOCK</span> for secret files</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">The decision logic — why this matters</div>
+        <p><strong>Secrets are the one hard block</strong> — flagged even on suspicion, always redacted, always "rotate it." <strong>Architecture only blocks with a written policy</strong>; without one it's downgraded to a warning so the guard never bullies you with its own taste. And a key in <code>tests/fixtures/</code> or an obvious dummy is a warning, not a block.</p>
+      </div>
+
+      <h3 class="block-title">What a verdict looks like</h3>
+      <div class="code"><span class="c-out">GUARD: BLOCKED — 2 blocking issues, 3 warnings</span>
+
+<span class="c-err">BLOCK  app/config.py:1-2  [secrets, high]</span>
+  Hardcoded API key + DB password replacing env reads: <span class="c-dim">&lt;redacted&gt;</span>
+  Fix: restore os.environ reads — and rotate the exposed credentials.
+
+<span class="c-err">BLOCK  app/handlers.py:1,5-14  [architecture, policy]</span>
+  Raw SQL + business logic in the thin handler. Policy: only service.py
+  may touch the DB. Fix: delegate back to service.get_user().
+
+<span class="c-dim">WARN   README.md:7-10  [docs-sync]</span>
+  "No secrets are stored… safe to make public" now contradicts config.py.</div>
+
+      <h3 class="block-title">The installed hook — and the division of labor</h3>
+      <p>Run <code>scripts/install-hook.sh</code> and it drops a script into <code>.git/hooks/pre-commit</code>. On every commit, git runs it — but it's deliberately <strong>dumb and fast</strong>: a deterministic secret + private-key + large-file scan that exits nonzero to block, with no thinking involved. It then reminds you to run the full review.</p>
+      <ul class="plain">
+        <li>The <strong>hook</strong> is the seatbelt that's always on — but it can only catch crude, pattern-matchable disasters.</li>
+        <li>The <strong>agent review</strong> is the one that understood your handler swallowed the database layer and that your README started lying — because it read the diff against rules you wrote down.</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-label">Important pitfall</div>
+        <p><strong>A leaked secret isn't fixed by unstaging.</strong> Once it's written to a file you control — and especially once committed — it must be rotated. <code>git reset</code> does not make it safe.</p>
+      </div>
+
+      <div class="try-strip">
+        <span class="label">Try it</span>
+        <code>demo-repos/commit-guard-demo/</code>
+        <span style="color:var(--text-muted);font-size:0.85rem">"Run the Semantic Commit Guard on my staged changes."</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ GIT BISECT AI ════════════ -->
+  <section class="chapter diagnose" id="bisect">
+    <div class="container">
+      <div class="chapter-head">
+        <div class="chapter-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-search"/></svg></span></div>
+        <div>
+          <div class="chapter-phase">Diagnose · The Detective</div>
+          <div class="chapter-name">Git Bisect AI</div>
+        </div>
+      </div>
+      <p class="chapter-tagline">"Turn 'this broke last week' into 'commit a1b2c3d broke it, here's why.'"</p>
+
+      <p class="lead-in">Somewhere in the last 200 commits, something that worked stopped working. <code>git bisect</code> can binary-search history to find the exact culprit — testing <code>log₂(N)</code> commits instead of all N — but it needs a reliable way to ask each commit "are you broken?" This skill acts as a <strong>forensic QA engineer</strong>: it pins down the bounds, builds that reliable test, drives the search unattended, then explains the offending change.</p>
+
+      <div class="callout">
+        <div class="callout-label">The make-or-break</div>
+        <p>The whole technique lives or dies on one thing: <strong>a reproduction command that reliably exits 0 when the bug is absent and nonzero when it's present.</strong> Get that right and the rest is mechanical. Most of the effort goes here — a flaky test produces a confident, wrong answer.</p>
+      </div>
+
+      <h3 class="block-title">How it works, step by step</h3>
+      <ol class="steps">
+        <li><strong>Safety check.</strong> Runs <code>git status --porcelain</code> and records the current branch + SHA so it can always put you back. If your tree is dirty, it bisects in a disposable <code>git worktree</code> instead of asking you to stash unrelated work.</li>
+        <li><strong>Define the bug and pick bounds.</strong> A <strong>bad</strong> commit (usually <code>HEAD</code>) and a <strong>good</strong> commit where it worked. It translates hints — "last week" becomes <code>git rev-list -1 --before="7 days ago" HEAD</code>; "the 1.2 release" becomes the tag.</li>
+        <li><strong>Choose a reproduction.</strong> A single failing test, a build command, or a headless browser script — whatever exits nonzero on the failure. The narrowest test bisects fastest.</li>
+        <li><strong>Validate the repro (never skipped).</strong> It proves the command <em>fails</em> on the bad commit and <em>passes</em> on the good one before searching. If not, the bounds or repro are wrong — fixed here, not after wasting a full bisect.</li>
+        <li><strong>Run the automated search.</strong> <code>git bisect run</code> with the bundled runner checks out each midpoint, runs your test, and narrows until it names the first bad commit.</li>
+        <li><strong>Report, then always clean up.</strong> Runs <code>git bisect reset</code> to restore HEAD (even on failure), then reads the culprit's diff and explains <em>why</em> that specific change caused the failure — not just that it's the boundary.</li>
+      </ol>
+
+      <h3 class="block-title">The runner's exit-code contract</h3>
+      <p>The bundled <code>bisect-run.sh</code> wrapper translates your test's result into git bisect's verdict. This is the clever part — it makes the search robust against a test command that misbehaves:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Test exit code</th><th>Verdict to git</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>0</code></td><td><span class="sev skip" style="color:var(--prevent);border-color:color-mix(in srgb,var(--prevent) 30%,transparent)">good</span></td><td>The bug is absent here.</td></tr>
+            <tr><td><code>125</code></td><td><span class="sev skip">skip</span></td><td>Can't judge this commit (e.g. it won't build while hunting a runtime bug).</td></tr>
+            <tr><td>anything else</td><td><span class="sev block">bad</span></td><td>The bug is present. Codes that could <em>abort</em> the search are collapsed to plain "bad" so a misbehaving test can't derail the run.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Handy flags adapt it to other hunts: <code>--build-is-bug</code> (a failing build <em>is</em> the regression), <code>--invert</code> (find when a failing test started <em>passing</em>), and <code>--timeout</code> to bound each step.</p>
+
+      <h3 class="block-title">A worked example</h3>
+      <p>A <code>multiply(a, b)</code> test regressed; the user says "math was fine in v1.0."</p>
+      <div class="code"><span class="c-dim"># validate the repro discriminates BEFORE bisecting</span>
+<span class="c-cmd">pytest tests/test_maths.py::test_multiply -q</span>   <span class="c-err"># on HEAD: FAILS  (bug present)</span>
+<span class="c-cmd">git checkout v1.0 && pytest …::test_multiply -q</span>  <span class="c-ok"># PASSES (bug absent)</span>
+
+<span class="c-dim"># run it unattended</span>
+<span class="c-cmd">git bisect start HEAD v1.0</span>
+<span class="c-cmd">git bisect run "$RUNNER" --test "pytest tests/test_maths.py::test_multiply -q"</span>
+<span class="c-out">→ a1b2c3d is the first bad commit</span>
+
+<span class="c-cmd">git bisect reset && git show a1b2c3d</span>
+<span class="c-dim"># the diff: multiply() was changed to `return a + b`</span></div>
+      <p>The report names commit <code>a1b2c3d</code>, its author/date/message, and the <em>why</em>: the operator was changed from <code>*</code> to <code>+</code>, so <code>multiply</code> adds instead of multiplies.</p>
+
+      <div class="callout">
+        <div class="callout-label">Important pitfalls</div>
+        <p><strong>The "good" commit isn't always good</strong> — a bad lower bound produces a confident-but-wrong culprit, which is why validation is mandatory. And the repro script lives <em>outside</em> the checkout (e.g. in <code>$TMPDIR</code>) so historical checkouts can't delete it mid-search.</p>
+      </div>
+
+      <div class="try-strip">
+        <span class="label">Try it</span>
+        <code>demo-repos/bisect-demo/</code>
+        <span style="color:var(--text-muted);font-size:0.85rem">"Find the commit that broke the multiply test."</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ DEPENDENCY UPGRADE LOOP ════════════ -->
+  <section class="chapter recover" id="upgrade-loop">
+    <div class="container">
+      <div class="chapter-head">
+        <div class="chapter-icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-shield"/></svg></span></div>
+        <div>
+          <div class="chapter-phase">Recover · The Medic</div>
+          <div class="chapter-name">Dependency Upgrade Loop</div>
+        </div>
+      </div>
+      <p class="chapter-tagline">"Bumping one framework cascades through everything. This works the cascade methodically."</p>
+
+      <p class="lead-in">A major upgrade rarely fails in one place — bumping a framework cascades through peer dependencies, renamed APIs, removed exports, and changed defaults. Try to fix it all at once and you get an unreadable wall of errors with no clear cause. This skill works the cascade <strong>one logical change at a time</strong>: bump, build, read the <em>first</em> error, fix exactly that, rebuild — looping until green or until it hits a real boundary worth reporting.</p>
+
+      <div class="callout">
+        <div class="callout-label">The discipline that makes it work</div>
+        <p><strong>One logical change per verify run.</strong> Sometimes that's one package; sometimes it's a framework plus its required peers. Keep each step small enough that the next failure has a clear, single cause.</p>
+      </div>
+
+      <h3 class="block-title">How it works, step by step</h3>
+      <ol class="steps">
+        <li><strong>Baseline.</strong> Records <code>git status --porcelain</code>, the package manager, and runtime versions, then runs the verify command <em>once</em> before changing anything — so "green" later means something. It preserves your work and never commits or removes lockfiles unasked.</li>
+        <li><strong>Inventory + ordered plan.</strong> Parses the manifest and orders the work safest-first: patch/minor bumps, then the framework everything pegs to, then that framework's peers, then everything else.</li>
+        <li><strong>Read the migration notes first.</strong> Knowing <code>componentWillMount → useEffect</code> or <code>url() → re_path()</code> up front turns a blind loop into a targeted edit. It uses official release notes, not model memory.</li>
+        <li><strong>The loop.</strong> For each item: apply one bump → install → build with the probe → find the first root error → fix exactly that → rebuild until green → checkpoint.</li>
+        <li><strong>Report.</strong> A <code>package: old → new</code> table, the code migrations made, any behavior changes that need human review, and the final verification output proving green.</li>
+      </ol>
+
+      <h3 class="block-title">The build probe is the oracle</h3>
+      <p>Every iteration runs through <code>scripts/build-probe.sh</code>, which executes your verify command, saves the full log, and highlights the likely <strong>root-error lines</strong>. The verify command is the loop's pass/fail signal — it must exit 0 when healthy and nonzero when broken.</p>
+      <div class="code"><span class="c-cmd">"$PROBE" --cmd "npm run build" --timeout 600 --log /tmp/dep-upgrade.log</span>
+<span class="c-err">→ root error: Module '"react-dom/client"' has no exported member 'render'</span>
+<span class="c-dim">   (later errors are usually cascades of this one — fix the first)</span></div>
+
+      <div class="callout">
+        <div class="callout-label">The loop guard — why it won't thrash</div>
+        <p>If the same root error survives <strong>3 focused fix attempts</strong>, it stops and reports a boundary instead of thrashing. It will <em>not</em> silence the problem with <code>--legacy-peer-deps</code>, transitive pins, or <code>@ts-nocheck</code> to fake a green build — those are reported as temporary boundaries, never as the fix.</p>
+      </div>
+
+      <h3 class="block-title">Triaging failures accurately</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Failure</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Resolver / peer conflict</strong> (<code>ERESOLVE</code>)</td><td>Solves the version graph first — never bypasses with force flags.</td></tr>
+            <tr><td><strong>Removed export / import</strong></td><td>Finds the replacement API, updates the smallest affected call sites, rebuilds.</td></tr>
+            <tr><td><strong>Type errors after a major</strong></td><td>Checks whether the library changed public types or local code leaned on an internal one.</td></tr>
+            <tr><td><strong>Runtime failures after compile</strong></td><td>Compares migration notes for new defaults, stricter parsing, async/auth changes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Important distinction</div>
+        <p><strong>Behavior changes are decisions, not syntax fixes.</strong> A migration that compiles can still change runtime semantics — a new default, stricter parsing, a dropped feature. These get flagged explicitly for human review rather than waved through. And <strong>"it compiles" isn't "it works"</strong> — the test suite is preferred as the oracle whenever one exists.</p>
+      </div>
+
+      <div class="try-strip">
+        <span class="label">Try it</span>
+        <code>demo-repos/dependency-upgrade-loop-demo/</code>
+        <span style="color:var(--text-muted);font-size:0.85rem">"Get this project building on the latest dependencies."</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <div class="container">
+      <a class="btn btn-primary" href="skills-landing.html#try-it">Copy the escape plan <span class="icon" style="width:18px;height:18px" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></span></a>
+      <p>Repo Rescue Rangers · prevent · diagnose · recover</p>
+    </div>
+  </footer>
+
+</body>
+</html>
