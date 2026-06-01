@@ -1131,6 +1131,26 @@
 
     .story-block p + p { margin-top: 12px; }
 
+    .story-code {
+      margin: 20px 0 0;
+      padding: 18px 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      color: var(--text);
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .story-code code {
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: inherit;
+    }
+
     .skill-detail-block {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -2371,7 +2391,7 @@
         <div class="skill-detail-grid">
           <div class="skill-detail-block">
             <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
-            <p>Pre-commit hooks check syntax. PR bots review after the damage. Neither catches "I committed a live API key AND updated the README to say we don't store secrets." That's a semantic problem — and it's how postmortems get born.</p>
+          <p>Linters and pre-commit hooks can catch syntax errors and formatting issues, but they cannot reason about intent. This skill analyzes changes before they become commits, identifying leaked credentials, architectural violations, risky code patterns, and contradictions between documentation and implementation. It prevents costly mistakes from ever reaching the main branch.</p>
           </div>
 
           <div class="skill-detail-block">
@@ -2386,17 +2406,20 @@
         </div>
 
         <div class="story-block">
-          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · commit-guard-demo</div>
-          <p>Staged changes hardcode <code style="font-family:var(--mono);font-size:0.82em">API_KEY = "sk-live-..."</code> and a DB password into <code style="font-family:var(--mono);font-size:0.82em">app/config.py</code>, smuggle raw SQL into the thin handler layer, and add a README "Security" section claiming <em>"No secrets are stored in this repository."</em></p>
-          <p>The guard reads both files together, spots the contradiction, blocks the commit. No bisect. No deps. Just prevention.</p>
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Example 1 — Layer Violation</div>
+          <div class="story-code"><code># routes/checkout.py
+checkout():
+    payment_gateway.charge(order.total)
+
+# ARCH.md
+"Route handlers must remain thin and delegate all business logic to service classes."
+</code></div>
+          <p>The guard reads both files, spots that business logic has been embedded in the handler layer, and blocks the commit before the architecture starts to drift.</p>
           <div class="scenario-tags">
             <span class="scenario-tag">skills/semantic-commit-guard/</span>
             <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + install-hook.sh</span>
           </div>
         </div>
-
-        <div class="skill-path">skills/semantic-commit-guard/SKILL.md + scripts/install-hook.sh</div>
-
         <a href="how-it-works.html#guard" class="skill-howlink">See how it works</a>
       </div>
     </div>
@@ -2419,9 +2442,10 @@
         <div class="skill-detail-grid">
           <div class="skill-detail-block">
             <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-alert"/></svg></span>Why you need it</h3>
-            <p>"It broke last week" is not a commit hash. Manual git archaeology burns hours, produces theories, and occasionally blames the intern (incorrectly). Bisect binary-searches history — but setting it up correctly is fiddly. This skill automates the whole thing.</p>
+          <p> Somewhere in the last 47 commits, a bug was born. </p>
+          <p>Instead of turning developers into amateur archaeologists, Git Bisect AI automates the entire investigation. </p>
+          <p>It validates the reproduction, performs a binary search through history, identifies the exact culprit commit, and explains why that change broke production.</p>
           </div>
-
           <div class="skill-detail-block">
             <h3 class="skill-detail-title"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>See how it works</h3>
             <ol class="skill-steps">
@@ -2436,16 +2460,22 @@
 
         <div class="story-block">
           <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · bisect-demo</div>
-          <p><code style="font-family:var(--mono);font-size:0.82em">multiply(4, 5)</code> should return <strong>20</strong>. Returns <strong>9</strong>. A commit "Optimize multiply for readability" quietly turned <code style="font-family:var(--mono);font-size:0.82em">a * b</code> into <code style="font-family:var(--mono);font-size:0.82em">a + b</code>.</p>
-          <p>Good: tag <code style="font-family:var(--mono);font-size:0.82em">v1.0</code>. Bad: <code style="font-family:var(--mono);font-size:0.82em">HEAD</code>. Agent binary-searches the history in a handful of steps. No guard. No deps. Pure detective work.</p>
+          <div class="story-code"><code># reproduce command
+multiply(4, 5)  # expected 20
+
+# bad commit change
+return a + b  # should be a * b
+
+# good/bad bounds
+good: v1.0
+bad: HEAD
+</code></div>
+          <p>The agent binary-searches history in a handful of steps, identifies the exact bad commit, and explains why the regression happened. No guard. No deps. Pure detective work.</p>
           <div class="scenario-tags">
             <span class="scenario-tag">skills/git-bisect-ai/</span>
             <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + bisect-run.sh</span>
           </div>
         </div>
-
-        <div class="skill-path">skills/git-bisect-ai/SKILL.md + scripts/bisect-run.sh</div>
-
         <a href="how-it-works.html#bisect" class="skill-howlink">See how it works</a>
       </div>
     </div>
@@ -2484,15 +2514,23 @@
 
         <div class="story-block">
           <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · pydantic v1 → v2</div>
-          <p><code style="font-family:var(--mono);font-size:0.82em">requirements.txt</code> pins Flask 1.1, pydantic 1.10, requests 2.22. Code imports <code style="font-family:var(--mono);font-size:0.82em">BaseSettings</code> from pydantic — removed in v2, moved to <code style="font-family:var(--mono);font-size:0.82em">pydantic-settings</code>.</p>
+          <div class="story-code"><code># requirements.txt
+Flask==1.1
+pydantic==1.10
+requests==2.22
+
+# code import
+from pydantic import BaseSettings
+
+# target upgrade
+pydantic v2 moves BaseSettings to pydantic-settings
+</code></div>
           <p>The loop bumps pins, adds the missing package, rewrites imports, and retries until imports succeed. No bisect. No guard. Just the dependency-upgrade-loop skill.</p>
           <div class="scenario-tags">
             <span class="scenario-tag">skills/dependency-upgrade-loop/</span>
             <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + build-probe.sh</span>
           </div>
         </div>
-
-        <div class="skill-path">skills/dependency-upgrade-loop/SKILL.md + scripts/build-probe.sh</div>
 
         <a href="how-it-works.html#upgrade-loop" class="skill-howlink">See how it works</a>
       </div>
