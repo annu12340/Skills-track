@@ -2160,11 +2160,14 @@
       </div>
       <h1 class="heading-hero">
         <span class="text-gradient" style="font-size: 13vh">Your repo isn't broken.</span>
-        <span class="line-accent">It's auditioning for a postmortem.</span>
+        <span class="line-accent">But that one bug is auditioning for an incident.</span>
       </h1>
       <p class="hero-lede">
-       Agent skills for Cursor, Claude Code, or Codex — <br/> one playbook for the whole disaster lifecycle. <br/>
-       Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack. Fewer Monday apologies.
+
+       And when that bug gets the part, Repo Rescue Rangers helps you save the day. Drop-in skills for Cursor/Claude Code/ Codex. 
+       <br/>
+<br/>
+       Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack. 
       </p>
       <div class="hero-actions">
         <a href="#demo" class="btn btn-primary">See it in action ↓</a>
@@ -2229,93 +2232,25 @@
               Your <code>requirements.txt</code> still thinks it's 2019. The upgrade ticket quietly marks itself "blocked."
             </p>
             <p>
-              Sound familiar? Most teams have three separate tools for three separate pains.
-              <strong>Repo Rescue Rangers</strong> gives your agent one playbook for all of them.
+              Sound familiar?
+  
             </p>
           </div>
         </div>
       </div>
     </section>
 
-  <!-- ═══════════════════ HACKATHON ═══════════════════ -->
-  <section class="hackathon-section" id="hackathon">
-    <div class="container hackathon-grid">
-      <div class="reveal">
-        <p class="section-label">Where it was built</p>
-        <h2 class="heading-section">Built at the UCWS Singapore Hackathon 2026</h2>
-        <div class="hackathon-prose">
-          <p>
-            <strong>Repo Rescue Rangers</strong> was conceived and shipped during the
-            <strong>UCWS Singapore Hackathon 2026</strong> — a build-it-in-the-room sprint with the
-            theme of <em>modular, reusable Agent Skills</em>.
-          </p>
-          <p>
-            I picked three pains every team actually
-            lives through — a leaked secret, a mystery regression, a stack that no longer builds —
-            and turned each into a portable skill that works across Claude Code, Cursor, and Codex.
-          </p>
-          <p>
-            Each skill is self-contained, follows the open Agent Skills format, and can be dropped into any repository without installation, package management, or infrastructure changes.
-          </p>
-        </div>
-      </div>
-      <div class="reveal">
-        <dl class="event-card">
-          <div class="event-card-row">
-            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-bolt"/></svg></span>
-            <div><dt>Event</dt><dd>UCWS Singapore Hackathon 2026</dd></div>
-          </div>
-          <div class="event-card-row">
-            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-shield"/></svg></span>
-            <div><dt>Track</dt><dd>Skills · Modular, reusable plugins</dd></div>
-          </div>
-          <div class="event-card-row">
-            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg></span>
-            <div><dt>Deliverable</dt><dd>Three portable Agent Skills + helper scripts</dd></div>
-          </div>
-          <div class="event-card-row">
-            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>
-            <div><dt>Status</dt><dd>Implemented &amp; demoed in isolated sandboxes</dd></div>
-          </div>
-        </dl>
-      </div>
-    </div>
-  </section>
 
-  <!-- ═══════════════════ PROBLEM-STATEMENT FIT ═══════════════════ -->
-  <section class="fit-section" id="problem-fit">
+
+  <!-- ═══════════════════ DEMO ═══════════════════ -->
+  <section class="top-demo" id="demo">
     <div class="container">
       <div class="section-header section-header--center reveal">
-        <p class="section-label section-label--center">How it fits the problem statement</p>
-        <h2 class="heading-section">Built to the brief — point by point</h2>
+        <p class="section-label section-label--center">Watch it work</p>
+        <h2 class="heading-section">See the Rescue Rangers in action</h2>
       </div>
-
-      <blockquote class="problem-quote reveal">
-        <p class="problem-quote-label">Skills</p>
-        <p>"Build modular, reusable skill plugins that developers around the world can integrate into their own projects."</p>
-      </blockquote>
-
-      <div class="fit-grid">
-        <article class="fit-card reveal">
-          <p class="fit-card-tag">Modular</p>
-          <h3>One skill, one job</h3>
-          <p>Each skill is a self-contained folder — <code>SKILL.md</code> plus optional <code>scripts/</code>, <code>references/</code>, and <code>agents/</code>. Prevent, diagnose, and recover are cleanly separated, so you adopt one or all three without entangling them.</p>
-        </article>
-        <article class="fit-card reveal">
-          <p class="fit-card-tag">Reusable</p>
-          <h3>Drop into any repo</h3>
-          <p>No application, no package manager, no install step. The skills are plain Markdown and shell helpers that work on any project — and they ship with resettable demo sandboxes so anyone can rehearse them in seconds.</p>
-        </article>
-        <article class="fit-card reveal">
-          <p class="fit-card-tag">Skill plugins</p>
-          <h3>Open Agent Skills format</h3>
-          <p>Every skill follows the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> spec. The same <code>SKILL.md</code> runs in Claude Code, Cursor, and Codex — only the install directory differs.</p>
-        </article>
-        <article class="fit-card reveal">
-          <p class="fit-card-tag">Integrate anywhere</p>
-          <h3>Copy &amp; go for developers worldwide</h3>
-          <p>Copy the three folders from <code>skills/</code> into <code>.claude/skills/</code>, <code>.cursor/skills/</code>, or <code>.codex/skills/</code> and the agent picks them up automatically. That's the whole integration.</p>
-        </article>
+      <div class="top-demo-frame reveal">
+        <iframe src="https://www.youtube.com/embed/GP8Ed94plAw" title="Repo Rescue Rangers demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </div>
   </section>
@@ -2357,18 +2292,6 @@
   </section>
 
 
-  <!-- ═══════════════════ DEMO ═══════════════════ -->
-  <section class="top-demo" id="demo">
-    <div class="container">
-      <div class="section-header section-header--center reveal">
-        <p class="section-label section-label--center">Watch it work</p>
-        <h2 class="heading-section">See the Rescue Rangers in action</h2>
-      </div>
-      <div class="top-demo-frame reveal">
-        <iframe src="https://www.youtube.com/embed/GP8Ed94plAw" title="Repo Rescue Rangers demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      </div>
-    </div>
-  </section>
 
   <!-- ═══════════════════ SKILL 1: GUARD ═══════════════════ -->
   <section class="skill-section prevent" id="guard">
@@ -2533,7 +2456,43 @@ pydantic v2 moves BaseSettings to pydantic-settings
     </div>
   </section>
 
+  <!-- ═══════════════════ PROBLEM-STATEMENT FIT ═══════════════════ -->
+  <section class="fit-section" id="problem-fit">
+    <div class="container">
+      <div class="section-header section-header--center reveal">
+        <p class="section-label section-label--center">How it fits the problem statement</p>
+        <h2 class="heading-section">Built to the brief — point by point</h2>
+      </div>
 
+      <blockquote class="problem-quote reveal">
+        <p class="problem-quote-label">Skills</p>
+        <p>"Build modular, reusable skill plugins that developers around the world can integrate into their own projects."</p>
+      </blockquote>
+
+      <div class="fit-grid">
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Modular</p>
+          <h3>One skill, one job</h3>
+          <p>Each skill is a self-contained folder — <code>SKILL.md</code> plus optional <code>scripts/</code>, <code>references/</code>, and <code>agents/</code>. Prevent, diagnose, and recover are cleanly separated, so you adopt one or all three without entangling them.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Reusable</p>
+          <h3>Drop into any repo</h3>
+          <p>No application, no package manager, no install step. The skills are plain Markdown and shell helpers that work on any project — and they ship with resettable demo sandboxes so anyone can rehearse them in seconds.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Skill plugins</p>
+          <h3>Open Agent Skills format</h3>
+          <p>Every skill follows the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> spec. The same <code>SKILL.md</code> runs in Claude Code, Cursor, and Codex — only the install directory differs.</p>
+        </article>
+        <article class="fit-card reveal">
+          <p class="fit-card-tag">Integrate anywhere</p>
+          <h3>Copy &amp; go for developers worldwide</h3>
+          <p>Copy the three folders from <code>skills/</code> into <code>.claude/skills/</code>, <code>.cursor/skills/</code>, or <code>.codex/skills/</code> and the agent picks them up automatically. That's the whole integration.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- ═══════════════════ TRY IT ═══════════════════ -->
   <section class="try-section" id="try-it">
