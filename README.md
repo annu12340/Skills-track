@@ -11,6 +11,12 @@ Three [Agent Skills](https://agentskills.io/) that cover the complete repo disas
 | Dependency revival time | Half a day of trial-and-error | **1 loop per error**, systematic |
 | Oncall incidents from bad commits | Unpredictable | **Blocked before `main`** |
 
+## Demo
+
+- https://skills-track.onrender.com/
+
+Watch the demo here:- https://www.youtube.com/watch?v=GP8Ed94plAw&feature=youtu.be
+
 ---
 
 ## The three-act story
