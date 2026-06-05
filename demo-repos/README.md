@@ -15,6 +15,7 @@ tracked by the parent repo — the generated `.git`/source live only on disk.
 |---|---|---|
 | [`bisect-demo/`](bisect-demo/) | `git-bisect-ai` | ~8-commit history with a regression planted mid-way + a `v1.0` good tag |
 | [`commit-guard-demo/`](commit-guard-demo/) | `semantic-commit-guard` | clean committed baseline + a **staged** diff that leaks a secret, lies in docs, and breaks the layering policy |
+| [`commit-guard-demo-pt/`](commit-guard-demo-pt/) | `semantic-commit-guard` | same scenario as above but with a Brazilian Portuguese codebase — shows the guard works on any human language |
 | [`dependency-upgrade-loop-demo/`](dependency-upgrade-loop-demo/) | `dependency-upgrade-loop` | a Python project pinned to ancient deps whose code won't build against modern versions |
 
 ## Run a demo

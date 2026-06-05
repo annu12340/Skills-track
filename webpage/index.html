@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Repo Rescue Rangers — three Cursor agent skills for blocking repo disasters before they become calendar events." />
+  <meta name="description" content="Repo Rescue Rangers — three agent skills for Claude Code, Cursor, and Codex. Linters catch syntax. This catches meaning — leaked secrets, architecture violations, broken changelogs — before they hit main." />
   <title>Repo Rescue Rangers · Fewer Monday Apologies</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2163,11 +2163,16 @@
         <span class="line-accent">But that one bug is auditioning for an incident.</span>
       </h1>
       <p class="hero-lede">
+<<<<<<< HEAD
 
        And when that bug gets the part, Repo Rescue Rangers helps you save the day. Drop-in skills for Cursor/Claude Code/ Codex. 
        <br/>
 <br/>
        Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack. 
+=======
+        Linters catch syntax. This catches <em style="-webkit-text-fill-color:var(--accent);color:var(--accent)">meaning</em> — leaked secrets, architecture violations, broken changelogs — before they hit <code style="font-family:var(--mono);font-size:0.9em">main</code>.<br><br>
+        Drop-in skills for Claude Code, Cursor, and Codex. Prevent bad commits. Bisect the regression. Upgrade the stale dependency stack.
+>>>>>>> c080872 (Pushing all changes)
       </p>
       <div class="hero-actions">
         <a href="#demo" class="btn btn-primary">See it in action ↓</a>
@@ -2239,7 +2244,6 @@
         </div>
       </div>
     </section>
-
 
 
   <!-- ═══════════════════ DEMO ═══════════════════ -->
@@ -2431,20 +2435,30 @@ bad: HEAD
           </div>
         </div>
 
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Python · pip / poetry</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Node · npm / yarn / pnpm</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Go · go mod</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Rust · cargo</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Ruby · bundler</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;padding:6px 12px;border-radius:999px;background:var(--recover-dim);color:var(--recover);border:1px solid color-mix(in srgb,var(--recover) 25%,transparent)">Java / Kotlin · Maven / Gradle</span>
+        </div>
+
         <div class="story-block">
-          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · pydantic v1 → v2</div>
+          <div class="story-block-label"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-film"/></svg></span>Standalone scenario · pydantic v1 → v2 (Python)</div>
           <div class="story-code"><code># requirements.txt
 Flask==1.1
 pydantic==1.10
 requests==2.22
 
 # code import
-from pydantic import BaseSettings
+from pydantic import BaseSettings   # ← moved to pydantic-settings in v2
 
 # target upgrade
 pydantic v2 moves BaseSettings to pydantic-settings
+.dict() renamed to .model_dump()
 </code></div>
-          <p>The loop bumps pins, adds the missing package, rewrites imports, and retries until imports succeed. No bisect. No guard. Just the dependency-upgrade-loop skill.</p>
+          <p>The loop bumps pins, adds the missing package, rewrites imports and method calls, retries until the build passes — and flags the silent <code style="font-family:var(--mono);font-size:0.85em">ValidationError</code> format change as a behavior decision. Works the same way for Go modules, Rust crates, and npm packages.</p>
           <div class="scenario-tags">
             <span class="scenario-tag">skills/dependency-upgrade-loop/</span>
             <span class="scenario-tag done"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-check"/></svg></span>Implemented + build-probe.sh</span>
@@ -2500,13 +2514,13 @@ pydantic v2 moves BaseSettings to pydantic-settings
       <div class="reveal">
         <p class="section-label">Get Started</p>
         <h2 class="heading-section">Try it in 60 seconds</h2>
-        <p>One clone, one top-level README, three isolated demos. Copy the skills into any project, then rehearse each scenario in its own sandbox — they're kept separate on purpose (see below).</p>
+        <p>One clone, one installer, three isolated demos. The installer auto-detects Claude Code, Cursor, or Codex in your project — no configuration needed.</p>
 
         <ol class="install-steps">
           <li>
             <div>
-              <strong>Copy the skills</strong>
-              <span>Copy the three folders from <code style="font-family:var(--mono);font-size:0.82em">skills/</code> into your project's <code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>, <code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code> directory.</span>
+              <strong>Clone &amp; install</strong>
+              <span>Run the zero-config installer. It detects <code style="font-family:var(--mono);font-size:0.82em">.claude/</code>, <code style="font-family:var(--mono);font-size:0.82em">.cursor/</code>, or <code style="font-family:var(--mono);font-size:0.82em">.codex/</code> in your project automatically. Override with <code style="font-family:var(--mono);font-size:0.82em">AGENT=cursor</code> if needed.</span>
             </div>
           </li>
           <li>
@@ -2518,7 +2532,7 @@ pydantic v2 moves BaseSettings to pydantic-settings
           <li>
             <div>
               <strong>Run the prompts</strong>
-              <span>Each <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> prints the prompt to hand the agent and the manual commands to drive it yourself.</span>
+              <span>Each <code style="font-family:var(--mono);font-size:0.82em">setup.sh</code> prints the exact prompt to hand the agent and the manual commands to drive it yourself.</span>
             </div>
           </li>
         </ol>
@@ -2530,21 +2544,20 @@ pydantic v2 moves BaseSettings to pydantic-settings
             <span>Terminal</span>
             <button class="copy-btn" data-copy="install-cmd">Copy</button>
           </div>
-          <pre id="install-cmd"><span class="comment"># Copy skills into your project (pick your agent's folder)</span>
-<span class="cmd">mkdir</span> -p <span class="path">YOUR_PROJECT/.cursor/skills</span>
-<span class="cmd">cp</span> -r skills/git-bisect-ai           <span class="path">YOUR_PROJECT/.cursor/skills/</span>
-<span class="cmd">cp</span> -r skills/semantic-commit-guard <span class="path">YOUR_PROJECT/.cursor/skills/</span>
-<span class="cmd">cp</span> -r skills/dependency-upgrade-loop <span class="path">YOUR_PROJECT/.cursor/skills/</span>
+          <pre id="install-cmd"><span class="comment"># Clone the repo</span>
+<span class="cmd">git</span> clone https://github.com/PLACEHOLDER/repo-rescue-rangers
+<span class="cmd">cd</span> repo-rescue-rangers
 
-<span class="comment"># One umbrella repo, three isolated demo sandboxes</span>
-<span class="path">demo-repos/</span>
-<span class="comment">├─ bisect-demo/           # planted regression in a clean git history</span>
-<span class="comment">├─ commit-guard-demo/     # a secret + a docs lie, staged & ready to block</span>
-<span class="comment">└─ dependency-upgrade-loop-demo/ # a stack frozen on dead dependency versions</span>
+<span class="comment"># Zero-config install into your project (auto-detects agent dir)</span>
+<span class="cmd">bash</span> scripts/install.sh <span class="path">/path/to/your/project</span>
 
-<span class="comment"># Spin up one demo (re-run to reset it)</span>
-<span class="cmd">cd</span> demo-repos/bisect-demo
-<span class="cmd">bash</span> setup.sh</pre>
+<span class="comment"># Or specify the agent explicitly</span>
+<span class="cmd">AGENT</span>=cursor <span class="cmd">bash</span> scripts/install.sh <span class="path">/path/to/your/project</span>
+
+<span class="comment"># Run a demo to verify (re-run to reset it)</span>
+<span class="cmd">bash</span> demo-repos/bisect-demo/setup.sh
+<span class="cmd">bash</span> demo-repos/commit-guard-demo/setup.sh
+<span class="cmd">bash</span> demo-repos/dependency-upgrade-loop-demo/setup.sh</pre>
         </div>
       </div>
     </div>
@@ -2566,7 +2579,12 @@ pydantic v2 moves BaseSettings to pydantic-settings
   
         <details class="faq-item">
           <summary>Can these work outside Cursor?</summary>
-          <p>These skills follow the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> format. The same <code style="font-family:var(--mono);font-size:0.82em">SKILL.md</code> works in Cursor, Claude Code, Codex, and other compatible agents — only the install directory differs.</p>
+          <p>Yes — and Cursor isn't even the primary target. These skills follow the open <a href="https://agentskills.io/" style="color:var(--accent)">Agent Skills</a> format. The same <code style="font-family:var(--mono);font-size:0.82em">SKILL.md</code> works in <strong>Claude Code</strong> (<code style="font-family:var(--mono);font-size:0.82em">.claude/skills/</code>), <strong>Cursor</strong> (<code style="font-family:var(--mono);font-size:0.82em">.cursor/skills/</code>), <strong>Codex</strong> (<code style="font-family:var(--mono);font-size:0.82em">.codex/skills/</code>), and any other tool that reads the format. Use <code style="font-family:var(--mono);font-size:0.82em">bash scripts/install.sh</code> to auto-detect the right directory.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>How is dependency-upgrade-loop different from Renovate or Dependabot?</summary>
+          <p>Renovate and Dependabot open upgrade PRs automatically and silently. They don't read changelogs, don't rewrite call sites for new APIs, and don't flag when a "passing" upgrade changes runtime behavior. <code style="font-family:var(--mono);font-size:0.82em">dependency-upgrade-loop</code> is an on-demand reasoning loop: it reads migration notes <em>before</em> bumping a major version, fixes the first root error (not the downstream cascades), and explicitly surfaces behavior changes as decisions for you to review. Use both — they solve different problems.</p>
         </details>
 
         <details class="faq-item">

@@ -1,0 +1,18 @@
+{
+  "id": "005",
+  "description": "A previously failing test now passes unexpectedly — find when it started passing (invert bisect). Should use --invert flag.",
+  "input": {
+    "scenario": "test_deprecated_api_removed was red for months and was supposed to stay red until we remove the deprecated endpoint. It's now green and we don't know when it started passing. That means someone deleted the endpoint without coordinating. Find the first commit where the test started passing.",
+    "commit_range": "last 30 commits on main",
+    "repo_state": "clean"
+  },
+  "expected": {
+    "must_contain": ["--invert", "passing test is bad"],
+    "must_not_contain": ["good commit"],
+    "reasoning_checkpoints": [
+      "invert",
+      "passing is bad",
+      "first commit where test started passing"
+    ]
+  }
+}

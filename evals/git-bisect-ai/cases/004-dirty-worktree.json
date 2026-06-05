@@ -1,0 +1,18 @@
+{
+  "id": "004",
+  "description": "Working tree has uncommitted changes unrelated to the bug. Bisect should create a temp worktree instead of asking user to stash.",
+  "input": {
+    "scenario": "test_login is failing since sometime last week. The repo has uncommitted WIP changes in src/ui/ (unrelated to auth). Repro: pytest tests/test_auth.py::test_login -q",
+    "commit_range": "unknown — user says 'last week'",
+    "repo_state": "dirty — WIP changes in src/ui/"
+  },
+  "expected": {
+    "must_contain": ["worktree", "stash"],
+    "must_not_contain": ["ask the user to stash"],
+    "reasoning_checkpoints": [
+      "temporary worktree",
+      "preserve",
+      "unrelated"
+    ]
+  }
+}

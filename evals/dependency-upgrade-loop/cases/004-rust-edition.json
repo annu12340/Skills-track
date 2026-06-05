@@ -1,0 +1,19 @@
+{
+  "id": "004",
+  "description": "Rust: tokio 0.2 → 1.x. #[tokio::main] attribute syntax changed, async runtime API moved. Non-npm, non-Python case.",
+  "input": {
+    "manifest": "[dependencies]\ntokio = { version = \"0.2\", features = [\"full\"] }\nserde = \"1.0\"",
+    "error": "error[E0277]: `impl Future<Output = ()>` cannot be sent between threads safely",
+    "language": "Rust",
+    "package_manager": "cargo"
+  },
+  "expected": {
+    "must_contain": ["cargo", "Cargo.toml", "tokio::main"],
+    "must_not_contain": ["npm", "pip", "requirements.txt"],
+    "reasoning_checkpoints": [
+      "migration guide",
+      "runtime",
+      "one change at a time"
+    ]
+  }
+}

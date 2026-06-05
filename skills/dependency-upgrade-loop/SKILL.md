@@ -111,13 +111,20 @@ Use `scripts/build-probe.sh` to run the verification command with a saved log
 and highlighted root-error candidates:
 
 ```bash
-PROBE="/absolute/path/to/dependency-upgrade-loop/scripts/build-probe.sh"
+# SKILL_ROOT env var takes priority; falls back to find.
+if [ -n "${SKILL_ROOT:-}" ] && [ -f "$SKILL_ROOT/dependency-upgrade-loop/scripts/build-probe.sh" ]; then
+  PROBE="$SKILL_ROOT/dependency-upgrade-loop/scripts/build-probe.sh"
+else
+  PROBE="$(find "$(git rev-parse --show-toplevel)" -maxdepth 6 \
+    -path '*/dependency-upgrade-loop/scripts/build-probe.sh' 2>/dev/null | head -1)"
+fi
 "$PROBE" --cmd "<verify command>" --timeout 600 --log "${TMPDIR:-/tmp}/dep-upgrade.log"
 ```
 
-Resolve the script from the installed skill path, not from a path that may be
-changed by the project build. If the helper is unavailable, run the same command
-directly and capture the full log yourself.
+Resolve the script before editing manifests (find paths may change during the
+upgrade). Set `SKILL_ROOT=/path/to/repo-rescue-rangers` if the finder returns
+empty. If the helper is still unavailable, run the verify command directly and
+capture the full log yourself.
 
 The verify command is the loop's pass/fail oracle. It must exit 0 when healthy
 and nonzero when broken.

@@ -1,0 +1,19 @@
+{
+  "id": "002",
+  "description": "User says 'it feels slower' with no measurable signal. Bisect should refuse to proceed without a pass/fail command.",
+  "input": {
+    "scenario": "The app seems slower than last week but there are no failing tests and no error messages. I just feel like page loads take longer.",
+    "commit_range": "unknown",
+    "repo_state": "clean working tree"
+  },
+  "expected": {
+    "verdict": "cannot-proceed",
+    "must_contain": ["pass/fail", "reproduction"],
+    "must_not_contain": ["git bisect start", "bisect run"],
+    "reasoning_checkpoints": [
+      "no reproducible",
+      "measurable",
+      "signal"
+    ]
+  }
+}

@@ -164,8 +164,13 @@ skill (it may live under `skills/`, `.claude/skills/`, `.cursor/skills/`, or
 `.codex/skills/`):
 
 ```bash
-HOOK="$(find "$(git rev-parse --show-toplevel)" -maxdepth 5 \
-  -path '*/semantic-commit-guard/scripts/install-hook.sh' 2>/dev/null | head -1)"
+# SKILL_ROOT env var takes priority; falls back to find.
+if [ -n "${SKILL_ROOT:-}" ] && [ -f "$SKILL_ROOT/semantic-commit-guard/scripts/install-hook.sh" ]; then
+  HOOK="$SKILL_ROOT/semantic-commit-guard/scripts/install-hook.sh"
+else
+  HOOK="$(find "$(git rev-parse --show-toplevel)" -maxdepth 6 \
+    -path '*/semantic-commit-guard/scripts/install-hook.sh' 2>/dev/null | head -1)"
+fi
 bash "$HOOK"            # installs .git/hooks/pre-commit (backs up any existing one)
 ```
 

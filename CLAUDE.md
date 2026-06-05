@@ -11,7 +11,7 @@ and `.codex/skills/` are symlinks into that tree.
 
 There is no application to build, no package manager, and no dependency install
 step. The deliverables are the skill definitions themselves plus a marketing
-landing page (`skills-landing.html`).
+landing page (`webpage/index.html`).
 
 The three skills cover the repo lifecycle — prevent, diagnose, recover:
 
@@ -35,7 +35,7 @@ Each skill is a folder under `skills/` containing:
 - Optional `agents/openai.yaml` UI metadata. Its `default_prompt` must mention the exact `$skill-name`.
 
 When adding or editing a skill, keep the SKILL.md as the single source of truth for how the skill
-behaves; the landing page (`skills-landing.html`) is hand-maintained marketing copy that must be
+behaves; the landing page (`webpage/index.html`) is hand-maintained marketing copy that must be
 updated separately if a skill's name or path changes.
 
 Keep installable skill folders lean. Top-level entries under `skills/<name>/` should be limited to

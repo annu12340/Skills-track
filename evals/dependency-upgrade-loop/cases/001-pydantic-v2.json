@@ -1,0 +1,19 @@
+{
+  "id": "001",
+  "description": "pydantic 1.10 → 2.x. BaseSettings moved to pydantic-settings, .dict() replaced by .model_dump(). Should produce a complete migration plan.",
+  "input": {
+    "manifest": "pydantic==1.10.2\nflask==2.3.0",
+    "broken_import": "from pydantic import BaseSettings",
+    "broken_call": "settings.dict()",
+    "error": "ImportError: cannot import name 'BaseSettings' from 'pydantic'"
+  },
+  "expected": {
+    "must_contain": ["pydantic-settings", "model_dump", "BaseSettings"],
+    "must_not_contain": ["--legacy-peer-deps", "ignore"],
+    "reasoning_checkpoints": [
+      "moved to pydantic-settings",
+      ".dict() replaced",
+      "migration guide"
+    ]
+  }
+}

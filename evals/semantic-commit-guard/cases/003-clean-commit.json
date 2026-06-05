@@ -1,0 +1,16 @@
+{
+  "id": "003",
+  "description": "Clean diff: adds a utility function with matching docstring, no secrets, no arch violations. Should PASS.",
+  "input": {
+    "staged_diff": "diff --git a/utils/formatters.py b/utils/formatters.py\nindex 0000000..a1b2c3d 100644\n--- /dev/null\n+++ b/utils/formatters.py\n@@ -0,0 +1,10 @@\n+def format_currency(amount: float, symbol: str = '$') -> str:\n+    \"\"\"Return amount formatted as a currency string.\n+\n+    Args:\n+        amount: Numeric value to format.\n+        symbol: Currency symbol prefix (default '$').\n+\n+    Returns:\n+        Formatted string, e.g. '$1,234.56'.\n+    \"\"\"\n+    return f\"{symbol}{amount:,.2f}\""
+  },
+  "expected": {
+    "verdict": "PASS",
+    "must_contain": ["PASS"],
+    "must_not_contain": ["BLOCK"],
+    "reasoning_checkpoints": [
+      "no blocking",
+      "clean"
+    ]
+  }
+}

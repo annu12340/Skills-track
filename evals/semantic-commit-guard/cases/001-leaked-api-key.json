@@ -1,0 +1,17 @@
+{
+  "id": "001",
+  "description": "Staged diff adds a hardcoded live API key to config.py. Should BLOCK with secret finding and rotation advice.",
+  "input": {
+    "staged_diff": "diff --git a/app/config.py b/app/config.py\nindex 3a2b1c0..8f4e2d1 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -1,5 +1,8 @@\n import os\n \n-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')\n+# temporary until we set up secrets manager\n+OPENAI_API_KEY = 'sk-live-aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789'\n+\n DB_HOST = os.getenv('DB_HOST', 'localhost')\n DB_PORT = int(os.getenv('DB_PORT', '5432'))"
+  },
+  "expected": {
+    "verdict": "BLOCK",
+    "must_contain": ["config.py", "sk-live", "rotate"],
+    "must_not_contain": ["GUARD: PASS"],
+    "reasoning_checkpoints": [
+      "live",
+      "credential",
+      "entropy"
+    ]
+  }
+}

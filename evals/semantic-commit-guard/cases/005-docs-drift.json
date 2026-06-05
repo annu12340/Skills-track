@@ -1,0 +1,17 @@
+{
+  "id": "005",
+  "description": "Function renamed from delete_user to archive_user (soft-delete), but README and docstring still say 'permanently removes'. Should WARN on docs-sync.",
+  "input": {
+    "staged_diff": "diff --git a/services/user_service.py b/services/user_service.py\nindex 1a2b3c4..5d6e7f8 100644\n--- a/services/user_service.py\n+++ b/services/user_service.py\n@@ -10,8 +10,9 @@\n-def delete_user(user_id: str) -> bool:\n-    \"\"\"Permanently removes the user and all associated data.\"\"\"\n-    db.execute('DELETE FROM users WHERE id = ?', user_id)\n-    return True\n+def archive_user(user_id: str) -> bool:\n+    \"\"\"Permanently removes the user and all associated data.\"\"\"\n+    db.execute('UPDATE users SET archived_at = NOW() WHERE id = ?', user_id)\n+    return True\ndiff --git a/README.md b/README.md\nindex 2b3c4d5..6e7f8a9 100644\n--- a/README.md\n+++ b/README.md\n@@ -22,3 +22,3 @@\n-Call `delete_user(id)` to permanently remove a user account and all data.\n+Call `archive_user(id)` to permanently remove a user account and all data."
+  },
+  "expected": {
+    "verdict": "WARN",
+    "must_contain": ["docstring", "README", "archive"],
+    "must_not_contain": ["BLOCK"],
+    "reasoning_checkpoints": [
+      "soft-delete",
+      "permanently",
+      "contradiction"
+    ]
+  }
+}

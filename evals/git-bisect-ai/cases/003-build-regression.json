@@ -1,0 +1,18 @@
+{
+  "id": "003",
+  "description": "TypeScript build was green at tag v2.0, now fails with 'Property X does not exist'. Bisect with --build-is-bug since the regression is the build itself.",
+  "input": {
+    "scenario": "npm run build fails with 'Property scrollBehavior does not exist on type RouterOptions'. It compiled fine at v2.0 tag. There are 12 commits between v2.0 and HEAD.",
+    "commit_range": "12 commits between v2.0 and HEAD",
+    "repo_state": "clean working tree"
+  },
+  "expected": {
+    "must_contain": ["build-is-bug", "setup", "npm"],
+    "must_not_contain": ["allow-test-skip"],
+    "reasoning_checkpoints": [
+      "build failure is the regression",
+      "--build-is-bug",
+      "failing setup means bad"
+    ]
+  }
+}

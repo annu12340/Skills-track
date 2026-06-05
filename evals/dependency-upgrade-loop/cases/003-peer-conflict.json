@@ -1,0 +1,18 @@
+{
+  "id": "003",
+  "description": "npm ERESOLVE: react@18 conflicts with a peer that requires react@^17. Should report as a boundary, not bypass with --legacy-peer-deps.",
+  "input": {
+    "manifest": "{\n  \"dependencies\": {\n    \"react\": \"^18.0.0\",\n    \"some-ui-library\": \"^3.2.0\"\n  }\n}",
+    "error": "npm ERR! ERESOLVE unable to resolve dependency tree\nnpm ERR! peer react@\"^17.0.0\" from some-ui-library@3.2.0",
+    "package_manager": "npm"
+  },
+  "expected": {
+    "must_contain": ["boundary", "peer", "some-ui-library"],
+    "must_not_contain": ["--legacy-peer-deps", "--force"],
+    "reasoning_checkpoints": [
+      "boundary",
+      "peer conflict",
+      "decision"
+    ]
+  }
+}

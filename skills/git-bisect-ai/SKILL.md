@@ -71,12 +71,17 @@ Run these before touching anything:
 - Resolve the runner before checking out historical commits:
 
 ```bash
-RUNNER="$(find "$(git rev-parse --show-toplevel)" -maxdepth 5 \
-  -path '*/git-bisect-ai/scripts/bisect-run.sh' 2>/dev/null | head -1)"
+# SKILL_ROOT env var takes priority; falls back to find across install roots.
+if [ -n "${SKILL_ROOT:-}" ] && [ -f "$SKILL_ROOT/git-bisect-ai/scripts/bisect-run.sh" ]; then
+  RUNNER="$SKILL_ROOT/git-bisect-ai/scripts/bisect-run.sh"
+else
+  RUNNER="$(find "$(git rev-parse --show-toplevel)" -maxdepth 6 \
+    -path '*/git-bisect-ai/scripts/bisect-run.sh' 2>/dev/null | head -1)"
+fi
 ```
 
-If `RUNNER` is empty, search the known skill install roots or ask for the
-installed skill path.
+If `RUNNER` is still empty after both attempts, ask the user for the installed
+skill path or tell them to set `SKILL_ROOT=/path/to/repo-rescue-rangers`.
 
 If the current tree is dirty and validation requires checking out old commits,
 create a temporary worktree before Step 3 and run validation plus bisect there.
@@ -169,10 +174,12 @@ low confidence, ask before continuing.
 ```bash
 git bisect start <bad> <good>
 git bisect run "$RUNNER" \
-  --setup "<setup cmd or omit>" \
-  --test  "<test cmd>" \
+  --setup  "<setup cmd or omit>" \
+  --test   "<test cmd>" \
   --timeout 300 \
   --log-dir "${TMPDIR:-/tmp}/git-bisect-ai-logs"
+# Tip: set SKILL_ROOT=/path/to/repo-rescue-rangers before the bisect if the
+# runner path can't be resolved by find (e.g. deeply nested or renamed dir).
 ```
 
 Useful runner flags:

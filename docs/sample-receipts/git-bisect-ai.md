@@ -29,6 +29,17 @@
 - Author/date/message: Demo Author, 2026-05-27, `Optimize multiply for readability`
 - Why it broke: `multiply(4, 5)` now returns `9` because the implementation returns `a + b` instead of `a * b`.
 
+## AI Reasoning Excerpt
+
+> After bisect identified `<demo sha>` as the first bad commit, I read the diff with `git show <sha>`. The change was a one-line edit to `mathlib/calc.py`:
+>
+> ```diff
+> -    return a * b
+> +    return a + b
+> ```
+>
+> The commit message says *"Optimize multiply for readability"* — the author likely meant to simplify the expression, not change its semantics. The arithmetic operator was changed from multiplication (`*`) to addition (`+`), which means `multiply(4, 5)` now returns `4 + 5 = 9` instead of `4 × 5 = 20`. Every downstream calculation that calls `multiply()` has been silently wrong since this commit landed. **This is the entire explanation** — the reproduction command (`multiply(4,5)==20`) fails on this commit and passes on every commit before it, confirming this is the exact boundary.
+
 ## Remaining Risk
 - This demo uses a narrow deterministic repro, so coverage is limited to the `multiply` behavior.
 - Historical commits outside the `v1.0..HEAD` range were not tested.

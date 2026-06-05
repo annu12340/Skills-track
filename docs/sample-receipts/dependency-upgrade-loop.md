@@ -30,6 +30,14 @@
 - Pydantic `1.10.2 -> 2.x` is the main compatibility boundary.
 - `BaseSettings` moved to `pydantic-settings`, so the migration requires adding a package, not just changing imports.
 
+## AI Reasoning Excerpt
+
+> The first root error in the build log was `ImportError: cannot import name 'BaseSettings' from 'pydantic'`. Before writing any code I checked the [Pydantic v2 migration guide](https://docs.pydantic.dev/latest/migration/), which documents that `BaseSettings` was intentionally removed from the core `pydantic` package and moved to the separate `pydantic-settings` package. This is not a renamed import — it requires adding a new dependency.
+>
+> I applied one change at a time: first added `pydantic-settings` to `requirements.txt` and updated the import in `app/settings.py`. After rebuilding, the second root error was `AttributeError: 'Settings' object has no attribute 'dict'` — Pydantic v2 renamed `.dict()` to `.model_dump()`. I fixed that in isolation and rebuilt.
+>
+> **Behavior change flagged**: Pydantic v2 changes how validation errors are structured. If `app/client.py` catches `pydantic.ValidationError` and inspects `.errors()`, the field names in the error dict changed format. I could not verify this from the demo tests alone — **human review of error handling paths is recommended before merging.**
+
 ## Remaining Risk
 - The demo verification only covers imports and the settings test.
 - Runtime HTTP behavior in `app/client.py` is not exercised beyond import.

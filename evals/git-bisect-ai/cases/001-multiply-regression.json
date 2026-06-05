@@ -1,0 +1,19 @@
+{
+  "id": "001",
+  "description": "multiply(a, b) returns a+b instead of a*b. History of 4 commits. Bisect should identify the commit that changed the operator.",
+  "input": {
+    "scenario": "multiply(4, 5) currently returns 9 instead of 20. The function worked correctly at tag v1.0. The repo has 4 commits after v1.0. Reproduction command: python3 -c \"from mathlib.calc import multiply; import sys; sys.exit(0 if multiply(4,5)==20 else 1)\"",
+    "commit_range": "4 commits between v1.0 and HEAD",
+    "repo_state": "clean working tree"
+  },
+  "expected": {
+    "culprit_pattern": "commit that changed .* to .*\\+",
+    "must_contain": ["multiply", "a + b", "a * b", "bisect reset"],
+    "must_not_contain": ["left mid-bisect", "forgot to reset"],
+    "reasoning_checkpoints": [
+      "operator",
+      "addition instead of multiplication",
+      "why"
+    ]
+  }
+}

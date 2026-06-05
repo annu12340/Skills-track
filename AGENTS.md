@@ -39,7 +39,7 @@ demo-repos/<demo>/setup.sh  ← materialize a throwaway repo per skill
 docs/                       ← supporting docs (e.g. the upgrade-loop workflow DAG)
 README.md                   ← human overview / install instructions
 CLAUDE.md                   ← authoring conventions for skill content
-skills-landing.html         ← hand-maintained marketing page
+webpage/index.html          ← hand-maintained marketing page
 ```
 
 **Critical for evaluation:** `.claude/`, `.cursor/`, and `.codex/` skill folders

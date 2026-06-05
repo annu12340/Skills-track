@@ -22,6 +22,14 @@
 - WARN `app/handlers.py`: debug print left on the request path.
 - WARN `README.md`: docs claim no secrets are stored while staged source contains credentials.
 
+## AI Reasoning Excerpt
+
+> `app/config.py:14` — I flagged `OPENAI_API_KEY = 'sk-live-...'` as a **high-confidence live credential** for three reasons: (1) the variable name matches the `api_key` / `token` / `secret` pattern in the policy; (2) the value has measured entropy of ~4.6 bits/char, above the 3.5 threshold that separates random secrets from readable strings; and (3) the `sk-live-` prefix is a known OpenAI production key prefix, not a test prefix (`sk-test-`). I redacted the value in this receipt and in the verdict output. **The credential must be rotated regardless of whether this commit is abandoned** — writing it to a file the user controls is sufficient for it to be considered exposed.
+>
+> `app/handlers.py:22` — Business logic moved into the handler layer. `.semantic-guard.md` explicitly states *"Route handlers must remain thin and delegate all business logic to service classes."* The diff adds `payment_gateway.charge(order.total)` directly to `checkout()`, which is the exact pattern the policy prohibits. I treated this as a **BLOCK** (policy violation) rather than a **WARN** (heuristic) because the rule is documented.
+>
+> `README.md` — The staged README edit adds the line *"No secrets are stored in this repository"* while `app/config.py` (also staged in this commit) contains a hardcoded credential. This is a docs-sync contradiction, upgraded to **WARN** because the claim directly contradicts the blocked finding above.
+
 ## Files Changed
 - `.repo-rescue/receipts/<timestamp>-semantic-commit-guard.md`
 

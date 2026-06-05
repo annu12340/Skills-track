@@ -1,0 +1,20 @@
+{
+  "id": "005",
+  "description": "Django 3 → 4: USE_L10N default flipped from True to False. Build passes but behavior changed. Skill must flag the behavior change explicitly.",
+  "input": {
+    "manifest": "Django==3.2.23\ndjango-rest-framework==3.14.0",
+    "error": "None — build passes after bumping to Django 4.2",
+    "behavior_note": "USE_L10N was True by default in Django 3; it is False by default in Django 4.",
+    "language": "Python",
+    "package_manager": "pip"
+  },
+  "expected": {
+    "must_contain": ["USE_L10N", "behavior", "default"],
+    "must_not_contain": ["build passes — done"],
+    "reasoning_checkpoints": [
+      "behavior change",
+      "default changed",
+      "human review"
+    ]
+  }
+}

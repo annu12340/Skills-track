@@ -1,0 +1,19 @@
+{
+  "id": "002",
+  "description": "Go module: gin v1 → v2. Router API changed (gin.Default() context, BindJSON → ShouldBindJSON). Non-npm ecosystem upgrade.",
+  "input": {
+    "manifest": "module example.com/api\n\ngo 1.21\n\nrequire (\n\tgithub.com/gin-gonic/gin v1.9.1\n)",
+    "error": "cannot use c.BindJSON (type func(obj any) error) as type func(obj interface{}) error",
+    "language": "Go",
+    "package_manager": "go mod"
+  },
+  "expected": {
+    "must_contain": ["go get", "ShouldBindJSON", "go.mod"],
+    "must_not_contain": ["npm", "pip"],
+    "reasoning_checkpoints": [
+      "go mod",
+      "migration",
+      "one change per iteration"
+    ]
+  }
+}

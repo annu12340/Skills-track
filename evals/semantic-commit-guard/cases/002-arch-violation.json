@@ -1,0 +1,18 @@
+{
+  "id": "002",
+  "description": "Route handler now calls the database directly, violating documented thin-handler policy. Should BLOCK or WARN on architecture.",
+  "input": {
+    "staged_diff": "diff --git a/routes/checkout.py b/routes/checkout.py\nindex 1a2b3c4..5d6e7f8 100644\n--- a/routes/checkout.py\n+++ b/routes/checkout.py\n@@ -1,7 +1,11 @@\n from flask import request, jsonify\n-from services.order_service import process_order\n+import psycopg2\n \n def checkout():\n     data = request.json\n-    result = process_order(data)\n+    conn = psycopg2.connect(dsn='postgresql://db:5432/orders')\n+    cur = conn.cursor()\n+    cur.execute('INSERT INTO orders VALUES (%s, %s)', (data['user_id'], data['total']))\n+    conn.commit()\n+    result = {'order_id': cur.lastrowid}\n     return jsonify(result)",
+    "policy_file": "ARCH.md contains: 'Route handlers must remain thin. All database access must go through service classes in services/.'"
+  },
+  "expected": {
+    "verdict": "BLOCK",
+    "must_contain": ["routes/checkout.py", "handler", "service"],
+    "must_not_contain": ["GUARD: PASS"],
+    "reasoning_checkpoints": [
+      "thin",
+      "layer",
+      "policy"
+    ]
+  }
+}
